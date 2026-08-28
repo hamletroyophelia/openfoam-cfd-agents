@@ -57,6 +57,118 @@ def test_manual_approval_is_an_explicit_workflow_state() -> None:
     assert manifest.stopped_after == "physics"
 
 
+def test_repairable_stage_retries_until_deterministic_gate_passes() -> None:
+    """Removing the retry loop must leave this stage failed after attempt one."""
+
+    supervisor = _module("openfoam_cfd_agents.agents.supervisor")
+    observations = iter([2.0, 1.5, 0.5])
+    repairs: list[tuple[int, StageStatus]] = []
+
+    def execute():
+        return _result("case_execution", observed=next(observations))
+
+    def repair(result, failed_attempt: int) -> None:
+        repairs.append((failed_attempt, result.status))
+
+    manifest = supervisor.SupervisorAgent().run(
+        [
+            supervisor.StageTask(
+                "case_execution",
+                execute,
+                repair=repair,
+                max_attempts=3,
+            )
+        ],
+        run_id="repair-success",
+    )
+
+    assert manifest.status is StageStatus.PASSED
+    assert [result.status for result in manifest.stages] == [
+        StageStatus.FAILED,
+        StageStatus.FAILED,
+        StageStatus.PASSED,
+    ]
+    assert [result.metrics["attempt"] for result in manifest.stages] == [1, 2, 3]
+    assert repairs == [(1, StageStatus.FAILED), (2, StageStatus.FAILED)]
+
+
+def test_repairable_stage_stops_after_attempt_budget_is_exhausted() -> None:
+    """Increasing attempts implicitly or running downstream would hide a failed gate."""
+
+    supervisor = _module("openfoam_cfd_agents.agents.supervisor")
+    executed: list[str] = []
+    repairs: list[int] = []
+
+    def execute_failed():
+        executed.append("case_execution")
+        return _result("case_execution", observed=2.0)
+
+    def repair(_result, failed_attempt: int) -> None:
+        repairs.append(failed_attempt)
+
+    def downstream():
+        executed.append("verification")
+        return _result("verification", observed=0.0)
+
+    manifest = supervisor.SupervisorAgent().run(
+        [
+            supervisor.StageTask(
+                "case_execution",
+                execute_failed,
+                repair=repair,
+                max_attempts=2,
+            ),
+            supervisor.StageTask("verification", downstream),
+        ],
+        run_id="repair-exhausted",
+    )
+
+    assert manifest.status is StageStatus.FAILED
+    assert manifest.stopped_after == "case_execution"
+    assert executed == ["case_execution", "case_execution"]
+    assert repairs == [1]
+    assert [result.metrics["attempt"] for result in manifest.stages] == [1, 2]
+
+
+def test_stage_task_rejects_an_invalid_attempt_budget() -> None:
+    """Allowing zero attempts would silently skip a required workflow stage."""
+
+    supervisor = _module("openfoam_cfd_agents.agents.supervisor")
+
+    with pytest.raises(ValueError, match="max_attempts"):
+        supervisor.StageTask("mesh", lambda: _result("mesh", 0.0), max_attempts=0)
+
+    with pytest.raises(ValueError, match="repair callback"):
+        supervisor.StageTask("mesh", lambda: _result("mesh", 0.0), max_attempts=2)
+
+
+def test_repair_exception_becomes_an_auditable_failed_stage() -> None:
+    """Letting a repair exception escape would leave no terminal manifest state."""
+
+    supervisor = _module("openfoam_cfd_agents.agents.supervisor")
+
+    def repair(_result, _failed_attempt: int) -> None:
+        raise RuntimeError("rewrite service unavailable")
+
+    manifest = supervisor.SupervisorAgent().run(
+        [
+            supervisor.StageTask(
+                "case_execution",
+                lambda: _result("case_execution", observed=2.0),
+                repair=repair,
+                max_attempts=3,
+            )
+        ],
+        run_id="repair-exception",
+    )
+
+    assert manifest.status is StageStatus.FAILED
+    assert manifest.stopped_after == "case_execution"
+    assert len(manifest.stages) == 1
+    assert manifest.stages[0].metrics["repair_exception_type"] == "RuntimeError"
+    assert "rewrite service unavailable" in manifest.stages[0].message
+
+
 def test_report_renders_machine_results_without_redeciding_status() -> None:
     supervisor = _module("openfoam_cfd_agents.agents.supervisor")
     report = _module("openfoam_cfd_agents.agents.report")

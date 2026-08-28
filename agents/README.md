@@ -1,31 +1,32 @@
 # Agent contracts
 
-这些 Agent 是工作流角色，不是数值判定器。当前 Python 实现在 `src/openfoam_cfd_agents/agents/`。
+These agents are workflow roles, not numerical judges. The current Python implementations live in `src/openfoam_cfd_agents/agents/`.
 
 ## Supervisor Agent
 
-- 输入：有序 `StageTask`、审批策略、运行标识。
-- 输出：`WorkflowManifest`。
-- 约束：只接受阶段产生的 `StageResult`；失败立即截断；需要人工审批时返回 `approval_required`。
+- Input: ordered `StageTask` objects, approval policy, and run identifier.
+- Output: `WorkflowManifest`.
+- Contract: accepts only `StageResult` outputs; stops on a failed gate; exposes `approval_required`; may run a bounded repair callback before repeating the same deterministic gate.
+- Audit rule: every failed and successful attempt remains in the manifest with its attempt number. A repair callback cannot change a failed result into a pass; it can only change external state before the stage is evaluated again.
 
 ## Monitor Agent
 
-- 输入：Foundation OpenFOAM 求解日志、显式阈值。
-- 输出：`monitoring` 阶段结果与原始日志 artifact。
-- 约束：解析程序生成指标；致命错误、进度不足、Courant 数、连续性误差或残差门失败时不得继续。
+- Input: a Foundation OpenFOAM solver log and explicit limits.
+- Output: a `monitoring` stage result plus the original log artifact.
+- Contract: parser code produces the metrics. Fatal errors, insufficient progress, excessive Courant number, continuity error, or residuals stop the workflow.
 
 ## Verification Agent
 
-- 输入：三个系统加密网格的单元数与同一目标量。
-- 输出：观测阶数、Richardson 外推、GCI、推荐级别与阶段状态。
-- 约束：拒绝重复网格规模、零差值及不可计算序列；阈值由配置给出。
+- Input: cell counts and the same quantity of interest from three systematically refined meshes.
+- Output: observed order, Richardson extrapolation, GCI, recommended level, and stage status.
+- Contract: rejects duplicate grid sizes, zero differences, and non-computable sequences; acceptance limits come from configuration.
 
 ## Report Agent
 
-- 输入：已持久化的 `WorkflowManifest`。
-- 输出：Markdown 报告。
-- 约束：仅展示证据，不重新决定状态，不把运行完成描述为结果可信。
+- Input: a persisted `WorkflowManifest`.
+- Output: Markdown.
+- Contract: presents evidence without deciding status again and never describes successful execution as a credible result.
 
-## 后续 Agent
+## Planned agents
 
-Physics、Case Builder、Mesh、HPC、Statistics、Postprocess 与独立 Reviewer 会在对应确定性工具和验收契约存在后接入。
+Physics, Case Builder, Mesh, HPC, Statistics, Postprocess, and an independent Reviewer will be added only after their deterministic tools and acceptance contracts exist.

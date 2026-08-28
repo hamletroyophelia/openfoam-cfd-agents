@@ -1,53 +1,68 @@
 # Architecture
 
-## Boundary
+## Stable core
 
-`openfoam_cfd_agents.domain` 是稳定核心。所有执行平台、LLM、调度器和可视化工具都在边界之外，只能通过适配器产生证据，再由核心规则计算状态。
+`openfoam_cfd_agents.domain` is the stable core. Execution platforms, LLMs, schedulers, and visualization systems remain outside it. They may produce evidence through adapters, but only core rules derive workflow status.
 
-## Flow
+## Stage flow
 
-1. Supervisor 调用一个阶段任务。
-2. Agent 或 Adapter 生成原始 artifact 与规范化 metrics。
-3. `MetricRule` 对 metrics 执行确定性比较。
-4. `evaluate_stage` 从所有检查结果派生 `passed` 或 `failed`。
-5. Supervisor 仅在 `passed` 且审批策略允许时进入下一阶段。
-6. Report 读取 Manifest，原样呈现状态和证据。
+1. The Supervisor invokes a stage task.
+2. An agent, adapter, or deterministic tool creates raw artifacts and normalized metrics.
+3. `MetricRule` compares metrics with explicit thresholds.
+4. `evaluate_stage` derives `passed` or `failed` from all checks.
+5. A failed repairable stage may invoke its repair callback and repeat, up to `max_attempts`.
+6. Every attempt remains in the manifest. Exhaustion stops downstream work.
+7. A passed stage advances only when its approval policy also permits it.
+8. The Report Agent renders the manifest without changing any decision.
 
-## OpenFOAM v14 profile
+The repair callback changes files or execution state; it never mutates a `StageResult`. A fresh stage execution must prove that the repair worked.
 
-- 平台：Foundation OpenFOAM。
-- 版本：14。
-- 单区域应用：`foamRun`。
-- 串行：`foamRun -case <path>`。
-- 并行：`decomposePar` → `mpirun -np N foamRun -parallel` → `reconstructPar`。
-- 所有命令使用参数数组执行，不拼接 shell 字符串。
-- 预检同时验证案例结构、环境变量、版本和必要可执行文件。
+## Integration layers
 
-`fieldMinMax` 等 function object 不进入默认模板。任何 function object 都必须先在目标 v14 安装的可用类型、源码或实际案例中验证。
+### Foam-Agent reasoning layer
 
-## Upstream integration
+`FoamAgentMcpAdapter` exposes the source-verified Foam-Agent sequence:
 
-### Foam-Agent
+| Operation | MCP tool | Envelope |
+| --- | --- | --- |
+| plan | `plan` | `request` |
+| generate case | `input_writer` | `request` |
+| run | `run` | `request` |
+| review errors | `review` | `request` |
+| apply fixes | `apply_fixes` | `request` |
+| visualize | `visualization` | `request` |
 
-后续通过规划端口接入其 Architect/Input Writer/Reviewer 能力。生成内容必须经过 v14 适配、案例预检和独立阶段门禁，不能直接继承其 Foundation v10 成功结论。
+Planning, generated dictionaries, and LLM-authored repairs must pass Foundation v14 adaptation, preflight, execution, and independent stage gates. Foam-Agent's default Foundation v10 references are not treated as v14 evidence.
 
-### openfoam-mcp
+### openfoam-mcp execution layer
 
-`OpenFoamMcpAdapter` 当前映射以下工具：
+`OpenFoamMcpAdapter` currently maps:
 
-| Workflow operation | MCP tool |
-| --- | --- |
-| preflight | `openfoam_preflight_check` |
-| validate case | `openfoam_validate_case` |
-| serial run | `openfoam_run_solver` |
-| parallel run | `openfoam_run_parallel` |
-| status | `openfoam_get_run_status` |
+| Operation | MCP tool | Envelope |
+| --- | --- | --- |
+| preflight | `openfoam_preflight_check` | `params` |
+| validate case | `openfoam_validate_case` | `params` |
+| serial run | `openfoam_run_solver` | `params` |
+| parallel run | `openfoam_run_parallel` | `params` |
+| status | `openfoam_get_run_status` | `params` |
 
-Adapter 接受注入的异步 `call_tool(name, arguments)`，因此不绑定特定 MCP Client SDK。调用方负责连接、认证、超时和重试策略。
+Both adapters accept an injected asynchronous `call_tool(name, arguments)` function and therefore do not depend on a specific MCP client SDK. The caller owns connection management, authentication, transport timeouts, and transport retries.
+
+openfoam-mcp may report `ready`, `degraded`, `blocked`, `completed_with_warnings`, or a serial fallback. These are valuable execution facts, not scientific acceptance decisions. Automatic stability fixes and fallback execution must be recorded and then checked again by the relevant stage gate.
+
+## Foundation OpenFOAM v14 profile
+
+- Platform: Foundation OpenFOAM.
+- Version: 14.
+- Single-region application: `foamRun`.
+- Serial: `foamRun -case <path>`.
+- Parallel: `decomposePar` -> `mpirun -np N foamRun -parallel` -> `reconstructPar`.
+- Commands use argument arrays, never concatenated shell strings.
+- Preflight checks the case structure, environment variables, version, and required executables.
+
+Function objects such as `fieldMinMax` do not enter default templates until their availability and syntax are verified in the target v14 installation, source, or an actual case.
 
 ## Trust model
-
-阶段状态的可信度按以下顺序递增：
 
 ```text
 process exited
@@ -57,4 +72,4 @@ process exited
 < physical validation passed
 ```
 
-较低层级的通过不能替代较高层级的检查。
+Passing a lower layer cannot replace a higher-layer check.
