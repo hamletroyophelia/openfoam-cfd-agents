@@ -30,24 +30,9 @@ Not yet implemented: production Physics, Case Builder, Mesh, HPC, Statistics, Po
 
 ## Architecture
 
-```text
-Foam-Agent MCP (reasoning)             openfoam-mcp (execution tools)
-  plan / input_writer                    preflight / validate / run / status
-  review / apply_fixes                              |
-             \                                      /
-              \                                    /
-               v                                  v
-                    Supervisor Agent
-                 ordered stages + repair budget
-                              |
-                 deterministic StageResult gates
-                    /          |          \
-          Monitor Agent  Verification Agent  approval
-                    \          |          /
-                       WorkflowManifest
-                              |
-                         Report Agent
-```
+![OpenFOAM CFD Agents architecture](docs/diagrams/openfoam-cfd-agents-architecture.drawio.png)
+
+[Editable draw.io source](docs/diagrams/openfoam-cfd-agents-architecture.drawio) · [Editable SVG export](docs/diagrams/openfoam-cfd-agents-architecture.drawio.svg)
 
 Foam-Agent supplies a reasoning-oriented planning and repair boundary. openfoam-mcp supplies an execution-oriented tool boundary. Neither upstream project's own success label is accepted as scientific approval: evidence must be normalized and evaluated by this project's deterministic gates.
 
@@ -102,7 +87,7 @@ The status is derived from rules. An agent cannot declare itself `passed`.
 openfoam cfd agents/
 ├── agents/                       # Agent responsibilities and contracts
 ├── config/                       # Workflow configuration
-├── docs/                         # Architecture and upstream study
+├── docs/                         # Architecture, diagrams, and upstream study
 ├── examples/phase1/              # CLI smoke-test inputs
 ├── src/openfoam_cfd_agents/
 │   ├── agents/                   # Supervisor, Monitor, Verification, Report
