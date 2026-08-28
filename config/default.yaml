@@ -1,0 +1,42 @@
+solver:
+  platform: openfoam
+  version: foundation-14
+  application: foamRun
+
+physics:
+  flow_type: incompressible
+  transient: true
+  turbulence_model: auto
+  multiphase_model: none
+
+verification:
+  mesh_levels: [coarse, medium, fine]
+  timestep_levels: [large, medium, small]
+  domain_independence: false
+  gci_analysis: true
+  gci_limit: 0.02
+
+hpc:
+  process_counts: [1, 2, 4, 8, 16]
+  benchmark_steps: 500
+  test_smt: true
+  test_decomposition_methods: true
+
+monitoring:
+  residuals: true
+  courant_number: true
+  conservation_errors: true
+  force_coefficients: true
+  automatic_stop: true
+  max_courant: 1.0
+  max_abs_cumulative_continuity_error: 1.0e-6
+  max_final_residual: 1.0e-3
+  min_time_steps: 1
+
+postprocessing:
+  formats: [csv, png, vtk]
+  fields: [velocity, pressure, vorticity]
+  vortex_methods: [Q, lambda2]
+
+report:
+  formats: [markdown]

@@ -1,0 +1,12 @@
+dimension: 3
+gci_limit: 0.051
+points:
+  - label: coarse
+    cells: 125000
+    value: 1.12
+  - label: medium
+    cells: 1000000
+    value: 1.04
+  - label: fine
+    cells: 8000000
+    value: 1.00
