@@ -1,0 +1,81 @@
+{
+  "package": "cfd-agents-blueprint",
+  "design_version": "2",
+  "updated_date": "2026-09-05",
+  "baseline_review_date": "2026-09-04",
+  "status": "design-and-handoff-not-implemented",
+  "wechat_report_read": false,
+  "remote_repository_modified": false,
+  "end_to_end_simulations_performed": false,
+  "reviewed_source_blobs": {
+    "README.md": "cd810969f69e6546f94616194c85324ed4eb65ec",
+    "src/openfoam_cfd_agents/domain.py": "fffca99ea7dd09cad98357ae3590d58381d75d7e"
+  },
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 2948,
+      "sha256": "ccb3fde70608750714bc6a6e972ff1e3d9a1e3f8586ffaa23cde342028e8eb35"
+    },
+    {
+      "path": "config/reliability-policy.example.yaml",
+      "bytes": 1990,
+      "sha256": "3e8e8e90e99028a6f89dc159734ccf4052de85c5918647f251b838465bfc6dc3"
+    },
+    {
+      "path": "docs/ACCEPTANCE_TESTS.md",
+      "bytes": 3735,
+      "sha256": "d08ab5bbd4edf3dc5fee0bb4cbcfb658937e48e96e0e4c2b2a6c0bb4591d2cfa"
+    },
+    {
+      "path": "docs/CHANGELOG_V2.md",
+      "bytes": 1438,
+      "sha256": "1858871b44683d3c562c64ae6916c7fabeaeeb39d644cabb4053fb296bac186c"
+    },
+    {
+      "path": "docs/IMPLEMENTATION_HANDOFF.md",
+      "bytes": 7646,
+      "sha256": "be75ad3648350c439f1a70d331aaf0d4fd687d614654f8c300aea06089ba8f93"
+    },
+    {
+      "path": "docs/SOURCES_V2.md",
+      "bytes": 3565,
+      "sha256": "c26df5f6e8d917d6030cf977cdff154fbadc1b3bf4653271944af5e96f0f26ad"
+    },
+    {
+      "path": "docs/SOURCE_REVIEW.md",
+      "bytes": 2059,
+      "sha256": "91d4c8b36eee78be4eb84b6c383d23dff492d990a3e2434689caaa141679d013"
+    },
+    {
+      "path": "docs/SYSTEM_DESIGN.zh-CN.md",
+      "bytes": 37182,
+      "sha256": "12d07cc8afa212bc67b25fc938c32212ecd76f46268ae94745178d330d86dfc0"
+    },
+    {
+      "path": "docs/UPSTREAM_REVIEW.md",
+      "bytes": 5929,
+      "sha256": "1d29c8e379cabad98a57c6bb740daf16bdbfa3117c9745266ea239918e38e5d2"
+    },
+    {
+      "path": "skills/cfd-orchestrator/SKILL.md",
+      "bytes": 5370,
+      "sha256": "e3487acec52ebcf0c8e2ef6acf3aebcb9b0888b021be16c2f2499c9e87fcf768"
+    },
+    {
+      "path": "skills/cfd-orchestrator/references/decision-rules.md",
+      "bytes": 3222,
+      "sha256": "39f1b3253868fd8a29800a8c639de8867a59a51418ae86b6fb1493b001c28f69"
+    },
+    {
+      "path": "validation/PACKAGE_QA.json",
+      "bytes": 502,
+      "sha256": "971a184121b54a7f6cd7297e97497878d328347ef10e5e91462611280c95cbb7"
+    },
+    {
+      "path": "validation/finite_comparison_probe.json",
+      "bytes": 1156,
+      "sha256": "ef84897861220fb75f78e9d821b1a3135612e26ba0278630cb35e203487d2a18"
+    }
+  ]
+}

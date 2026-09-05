@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Literal
 from uuid import uuid4
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -37,6 +38,7 @@ class WorkflowManifest(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
+    schema_version: Literal[2] = 2
     run_id: str = Field(min_length=1)
     status: StageStatus
     stages: list[StageResult] = Field(default_factory=list)
@@ -86,6 +88,15 @@ class SupervisorAgent:
                     raise ValueError(
                         f"stage task '{task.name}' returned result for '{result.stage}'"
                     )
+                if result.status is StageStatus.PASSED:
+                    checked = evaluate_stage(
+                        stage=result.stage, metrics=result.metrics,
+                        rules=[MetricRule(metric=c.metric, operator=c.operator, threshold=c.threshold)
+                               for c in result.checks], artifacts=result.artifacts,
+                    )
+                    if checked.status is not StageStatus.PASSED or result.invalid_metric_paths:
+                        result = checked.model_copy(update={"status": StageStatus.FAILED,
+                                                           "message": "Claimed pass failed deterministic re-evaluation."})
                 if task.max_attempts > 1:
                     result = result.model_copy(
                         update={
@@ -102,7 +113,7 @@ class SupervisorAgent:
                     break
 
                 if attempt == task.max_attempts or task.repair is None:
-                    manifest.status = StageStatus.FAILED
+                    manifest.status = result.status
                     manifest.stopped_after = task.name
                     return manifest
 

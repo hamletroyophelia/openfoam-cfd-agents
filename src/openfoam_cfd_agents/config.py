@@ -10,7 +10,7 @@ from pydantic import BaseModel, ConfigDict, Field, PositiveInt
 
 
 class StrictModel(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
+    model_config = ConfigDict(extra="forbid", frozen=True, allow_inf_nan=False)
 
 
 class SolverConfig(StrictModel):
@@ -50,11 +50,11 @@ class MonitoringConfig(StrictModel):
     courant_number: bool = True
     conservation_errors: bool = True
     force_coefficients: bool = True
-    automatic_stop: bool = True
+    automatic_stop: bool = False
     max_courant: float = Field(default=1.0, gt=0)
     max_abs_cumulative_continuity_error: float = Field(default=1e-6, gt=0)
     max_final_residual: float = Field(default=1e-3, gt=0)
-    min_time_steps: int = Field(default=1, ge=1)
+    min_time_steps: int = Field(default=2, ge=2)
 
 
 class PostprocessingConfig(StrictModel):

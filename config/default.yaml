@@ -27,11 +27,12 @@ monitoring:
   courant_number: true
   conservation_errors: true
   force_coefficients: true
-  automatic_stop: true
+  # Reserved policy flag; automatic process termination is not implemented.
+  automatic_stop: false
   max_courant: 1.0
   max_abs_cumulative_continuity_error: 1.0e-6
   max_final_residual: 1.0e-3
-  min_time_steps: 1
+  min_time_steps: 2
 
 postprocessing:
   formats: [csv, png, vtk]

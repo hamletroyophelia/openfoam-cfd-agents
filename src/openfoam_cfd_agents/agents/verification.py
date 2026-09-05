@@ -6,11 +6,11 @@ import math
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from openfoam_cfd_agents.domain import MetricRule, StageResult, evaluate_stage
+from openfoam_cfd_agents.domain import MetricRule, StageResult, StageStatus, evaluate_stage
 
 
 class MeshStudyPoint(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
+    model_config = ConfigDict(extra="forbid", frozen=True, allow_inf_nan=False)
 
     label: str = Field(min_length=1)
     cells: int = Field(gt=0)
@@ -18,7 +18,7 @@ class MeshStudyPoint(BaseModel):
 
 
 class GCIResult(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
+    model_config = ConfigDict(extra="forbid", frozen=True, allow_inf_nan=False)
 
     ordered_labels: list[str]
     observed_order: float
@@ -39,9 +39,13 @@ def _observed_order(
 ) -> float:
     if epsilon_21 == 0 or epsilon_32 == 0:
         raise ValueError("successive solution differences must be non-zero")
+    if epsilon_21 * epsilon_32 <= 0:
+        raise ValueError("non-monotonic convergence: GCI applicability is not established")
 
     sign = 1.0 if epsilon_32 / epsilon_21 > 0 else -1.0
-    current = abs(math.log(abs(epsilon_32 / epsilon_21)) / math.log(ratio_21))
+    current = math.log(epsilon_32 / epsilon_21) / math.log(ratio_21)
+    if current <= 0:
+        raise ValueError("divergent sequence: differences must decrease toward the fine mesh")
     current = max(current, 1e-8)
     for _ in range(100):
         numerator = ratio_21**current - sign
@@ -49,10 +53,12 @@ def _observed_order(
         if numerator <= 0 or denominator <= 0:
             raise ValueError("mesh sequence does not permit a real observed order")
         correction = math.log(numerator / denominator)
-        updated = abs(
+        updated = (
             (math.log(abs(epsilon_32 / epsilon_21)) + correction)
             / math.log(ratio_21)
         )
+        if updated <= 0 or not math.isfinite(updated):
+            raise ValueError("positive finite observed order is not established")
         if abs(updated - current) < 1e-10:
             return updated
         current = max(updated, 1e-8)
@@ -71,7 +77,7 @@ def calculate_gci(
         raise ValueError("GCI requires exactly three mesh levels")
     if dimension < 1:
         raise ValueError("dimension must be at least one")
-    if safety_factor <= 1:
+    if not math.isfinite(safety_factor) or safety_factor <= 1:
         raise ValueError("safety_factor must be greater than one")
     if len({point.cells for point in points}) != 3:
         raise ValueError("mesh levels must have distinct cell counts")
@@ -121,8 +127,10 @@ class VerificationAgent:
     """Prepare GCI evidence and apply explicit verification gates."""
 
     def __init__(self, *, gci_limit: float = 0.02, minimum_order: float = 0.1) -> None:
-        if gci_limit <= 0:
+        if not math.isfinite(gci_limit) or gci_limit <= 0:
             raise ValueError("gci_limit must be positive")
+        if not math.isfinite(minimum_order) or minimum_order <= 0:
+            raise ValueError("minimum_order must be positive and finite")
         self.gci_limit = gci_limit
         self.minimum_order = minimum_order
 
@@ -133,10 +141,14 @@ class VerificationAgent:
         dimension: int = 3,
         artifact: str | None = None,
     ) -> StageResult:
-        gci = calculate_gci(points, dimension=dimension)
+        try:
+            gci = calculate_gci(points, dimension=dimension)
+        except (ValueError, OverflowError, ZeroDivisionError) as exc:
+            return StageResult(stage="mesh_verification", status=StageStatus.INCONCLUSIVE,
+                               metrics={"applicable": False}, message=str(exc),
+                               artifacts=[artifact] if artifact else [])
         metrics = gci.model_dump(mode="json")
-        metrics["recommended_level"] = gci.ordered_labels[0]
-        return evaluate_stage(
+        result = evaluate_stage(
             stage="mesh_verification",
             metrics=metrics,
             rules=[
@@ -149,3 +161,6 @@ class VerificationAgent:
             ],
             artifacts=[artifact] if artifact else [],
         )
+        if result.status is StageStatus.PASSED:
+            return result.model_copy(update={"metrics": {**metrics, "recommended_level": gci.ordered_labels[0]}})
+        return result

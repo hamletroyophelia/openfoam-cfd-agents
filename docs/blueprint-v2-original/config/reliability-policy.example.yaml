@@ -1,0 +1,48 @@
+# PROPOSED CONFIGURATION CONTRACT — not accepted by the current CLI unless implemented.
+# Values are policies, not evidence that their implementation exists.
+schema_version: "proposal-v2"
+status: "design_only"
+capability_admission:
+  distinguish_claims_from_evidence: true
+  require_contract_tests_before_integration: true
+  require_runtime_evidence_before_production: true
+  scope_scientific_evidence_by_case_and_qoi: true
+  recheck_on_environment_or_schema_change: true
+metrics:
+  require_finite_observations: true
+  require_finite_thresholds: true
+  reject_boolean_as_numeric_evidence: true
+  invalid_numeric_json_encoding: "null_with_validity_reason"
+  tolerances: "required_per_quantity_with_provenance"
+jobs:
+  owner: "durable_worker"
+  idempotency_scope: [principal_id, project_id, idempotency_key]
+  reject_same_key_with_different_digest: true
+  persist_launch_intent_before_start: true
+  reconcile_ambiguous_launch_before_retry: true
+  lease_expiry_does_not_prove_process_exit: true
+  require_verified_checkpoint: true
+  cancellation_ack_is_not_process_exit: true
+mcp:
+  business_job_model_independent_of_protocol: true
+  task_support: "capability_checked_optional_bridge"
+  fallback: "business_job_id_and_status_tools"
+  trust_tool_annotations_for_authorization: false
+provenance:
+  immutable_input_revisions: true
+  approval_bound_to_revision_rules_and_budget: true
+  invalidate_only_affected_evidence: true
+  preserve_historical_verdicts: true
+  authoritative_data: "native_fields_and_verified_derived_arrays"
+  preview_must_declare_lossy_transformations: true
+security:
+  remote_gateway_requires_authentication: true
+  validate_token_audience: true
+  token_passthrough: false
+  arbitrary_shell_or_python_enabled_by_default: false
+  dynamic_case_code_requires_review: true
+  authorize_every_job_and_artifact_access: true
+scope:
+  primary_release: "tested_OpenFOAM_profiles"
+  commercial_solvers: "future_adapters_require_runtime_and_license_checks"
+  vibeflow_required: false

@@ -1,0 +1,18 @@
+{
+  "checks": {
+    "markdown_local_links": "passed",
+    "markdown_code_fences": "passed",
+    "yaml_parse": "passed",
+    "strict_json_probe": "passed",
+    "arithmetic_probe_cases": 4
+  },
+  "not_performed": [
+    "target repository test suite",
+    "OpenFOAM execution",
+    "MCP integration",
+    "MPI or scheduler fault injection",
+    "ParaView rendering",
+    "remote repository writes"
+  ],
+  "note": "Package consistency checks only. Acceptance cases are specifications, not passed tests."
+}

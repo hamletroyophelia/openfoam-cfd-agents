@@ -11,6 +11,7 @@ Time = 0.1
 smoothSolver: Solving for Ux, Initial residual = 0.01, Final residual = 1e-06, No Iterations 2
 Courant Number mean: 0.03 max: 0.8
 time step continuity errors : sum local = 1e-08, global = -2e-09, cumulative = 3e-08
+ExecutionTime = 1 s ClockTime = 1 s
 """
 
 
@@ -24,7 +25,7 @@ def _app():
 def test_monitor_command_writes_the_machine_readable_stage_result(tmp_path: Path) -> None:
     log_path = tmp_path / "log.foamRun"
     result_path = tmp_path / "monitor.json"
-    log_path.write_text(GOOD_LOG, encoding="utf-8")
+    log_path.write_text(GOOD_LOG + GOOD_LOG.replace('0.1', '0.2'), encoding="utf-8")
 
     result = CliRunner().invoke(
         _app(),

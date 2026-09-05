@@ -1,5 +1,7 @@
 # OpenFOAM CFD Agents
 
+[中文说明](README.zh-CN.md) · [0.2.0 reliability and acceptance coverage](docs/RELIABILITY_V2.md) · [Changelog](CHANGELOG.md)
+
 An auditable, reproducible multi-agent workflow for the full lifecycle of OpenFOAM CFD cases. The current runtime profile targets **Foundation OpenFOAM v14**. Ports and adapters keep the core open to SU2, Fluent, STAR-CCM+, schedulers, and external agent systems.
 
 > The project is an early Phase 1 MVP. It provides a deterministic control plane and integration boundaries; it does not yet provide unattended natural-language modeling or a complete production CFD lifecycle.
@@ -25,6 +27,9 @@ An auditable, reproducible multi-agent workflow for the full lifecycle of OpenFO
 | Foam-Agent MCP Adapter | Maps planning, case generation, execution, review, repair, and visualization to Foam-Agent's real `request` contracts |
 | openfoam-mcp Adapter | Maps preflight, case validation, serial/parallel execution, and status queries to its real `params` contracts |
 | CLI | Configuration validation, log monitoring, mesh verification, run-plan generation, and report rendering |
+| Reliability tools | Live completed-time progress, PID identity, MPI error detection, checkpoint candidates, physical-core conflicts and runtime availability probes |
+| Local job ledger | Transactional idempotency, case-writer reservations and explicit transition contracts; Python API only, no durable worker |
+| Evidence contracts | Dependency-based reuse and approval scopes; Python API only, not yet connected to automatic revision capture |
 
 Not yet implemented: production Physics, Case Builder, Mesh, HPC, Statistics, Postprocess, and independent Reviewer agents; an LLM provider; live automatic solver termination; SLURM/PBS; HTML/PDF reports; and a complete Foundation v14 template library.
 
@@ -62,18 +67,38 @@ cfd-workflow plan-run 'D:\cases\case with spaces' --processes 16 --output .\runs
 
 Before actual OpenFOAM execution, the host must load Foundation v14 so that `WM_PROJECT_DIR`, `WM_PROJECT_VERSION=14`, `foamRun`, `blockMesh`, and `checkMesh` are available. Windows can run the analysis, verification, and reporting tools. Solving normally runs on a configured Linux host, container, or HPC node.
 
+Additional 0.2.0 commands:
+
+```bash
+cfd-workflow probe-runtime --solver-module incompressibleVoF
+cfd-workflow checkpoint /path/to/case --processes 4 --fields U,p
+cfd-workflow audit-cpus topology.csv --cpus 0-3 --reserved 4-7
+cfd-workflow live-monitor /path/to/log.solver --pid 1234 --job-id run-1 --state /path/to/state.json
+cfd-workflow plan-run /path/to/case --processes 4 --restart-time 1.0 --fields U,p --shared-memory-mpi
+```
+
+Generate `topology.csv` with `lscpu -p=CPU,CORE,SOCKET,NODE`. Required restart fields
+must include the actual solver/time-scheme history; `U,p` is only a simple-case example.
+First live observation establishes a baseline (exit 2), and later completed-time
+advancement is required. A passed checkpoint inspection is a candidate, not restart
+authorization or full-payload verification. Read the [operational limits](docs/RELIABILITY_V2.md)
+before use. Shared-memory MPI is an opt-in, single-host Open MPI 4.x profile.
+
 ## Machine-readable result
 
 ```json
 {
-  "stage": "mesh_verification",
+  "schema_version": 2,
+  "stage": "example_gci_gate",
   "status": "passed",
   "metrics": {
-    "fine_gci": 0.018,
-    "observed_order": 1.92,
-    "recommended_level": "fine"
+    "fine_gci": 0.018
   },
-  "checks": [],
+  "checks": [{
+    "metric": "fine_gci", "operator": "<=", "threshold": 0.02,
+    "observed": 0.018, "passed": true,
+    "message": "Observed fine_gci=0.018 satisfies <= 0.02."
+  }],
   "artifacts": ["mesh-study.yaml"],
   "message": "All acceptance checks passed."
 }

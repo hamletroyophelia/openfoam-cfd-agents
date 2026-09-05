@@ -16,6 +16,8 @@ from openfoam_cfd_agents.agents.supervisor import WorkflowManifest
 from openfoam_cfd_agents.agents.verification import MeshStudyPoint, VerificationAgent
 from openfoam_cfd_agents.config import load_config
 from openfoam_cfd_agents.domain import StageStatus
+from openfoam_cfd_agents.reliability.cli import register
+from openfoam_cfd_agents.reliability.checkpoints import parse_field_list
 
 
 app = typer.Typer(
@@ -23,13 +25,14 @@ app = typer.Typer(
     help="Auditable Foundation OpenFOAM v14 workflow utilities.",
     no_args_is_help=True,
 )
+register(app)
 
 
 def _write_json(payload: object, output: Path | None) -> None:
     text = (
         payload.model_dump_json(indent=2)
         if hasattr(payload, "model_dump_json")
-        else json.dumps(payload, ensure_ascii=False, indent=2)
+        else json.dumps(payload, ensure_ascii=False, indent=2, allow_nan=False)
     )
     if output is None:
         typer.echo(text)
@@ -55,7 +58,9 @@ def monitor(
     max_courant: Annotated[float, typer.Option()] = 1.0,
     max_continuity_error: Annotated[float, typer.Option()] = 1e-6,
     max_final_residual: Annotated[float, typer.Option()] = 1e-3,
-    min_time_steps: Annotated[int, typer.Option()] = 1,
+    min_time_steps: Annotated[int, typer.Option(min=2)] = 2,
+    max_interface_courant: Annotated[float | None, typer.Option()] = None,
+    alpha_tolerance: Annotated[float | None, typer.Option()] = None,
 ) -> None:
     """Parse a solver log and apply deterministic run-health gates."""
 
@@ -64,6 +69,8 @@ def monitor(
         max_abs_cumulative_continuity_error=max_continuity_error,
         max_final_residual=max_final_residual,
         min_time_steps=min_time_steps,
+        max_interface_courant=max_interface_courant,
+        alpha_tolerance=alpha_tolerance,
     )
     result = MonitorAgent(thresholds).evaluate_file(log_path.resolve())
     _write_json(result, output)
@@ -97,10 +104,15 @@ def plan_run(
     case_path: Annotated[Path, typer.Argument(exists=True, file_okay=False, readable=True)],
     processes: Annotated[int, typer.Option(min=1)] = 1,
     output: Annotated[Path | None, typer.Option("--output", "-o")] = None,
+    restart_time: Annotated[str | None, typer.Option()] = None,
+    fields: Annotated[str, typer.Option(help='Required checkpoint fields for a restart')] = '',
+    shared_memory_mpi: Annotated[bool, typer.Option(help='Single-host Open MPI 4.x self,vader transport')] = False,
 ) -> None:
     """Create a shell-free serial or MPI command plan without executing it."""
 
-    plan = LocalOpenFoamAdapter().build_run_plan(case_path, processes=processes)
+    plan = LocalOpenFoamAdapter().build_run_plan(case_path, processes=processes, restart_time=restart_time,
+                                                required_fields=parse_field_list(fields) if fields else [],
+                                                shared_memory_mpi=shared_memory_mpi)
     _write_json(plan, output)
 
 

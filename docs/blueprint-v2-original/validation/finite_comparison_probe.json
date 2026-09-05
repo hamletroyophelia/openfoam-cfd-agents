@@ -1,0 +1,43 @@
+{
+  "kind": "synthetic_independent_float_comparison_probe",
+  "target_repository_test_executed": false,
+  "date": "2026-09-05",
+  "cases": [
+    {
+      "id": "observed_nan_ne_zero",
+      "observed_symbol": "nan",
+      "operator": "!=",
+      "threshold_symbol": "0.0",
+      "comparison_result": true,
+      "both_inputs_finite": false,
+      "proposed_finite_guard_accepts": false
+    },
+    {
+      "id": "observed_posinf_ge_zero",
+      "observed_symbol": "inf",
+      "operator": ">=",
+      "threshold_symbol": "0.0",
+      "comparison_result": true,
+      "both_inputs_finite": false,
+      "proposed_finite_guard_accepts": false
+    },
+    {
+      "id": "observed_neginf_le_one",
+      "observed_symbol": "-inf",
+      "operator": "<=",
+      "threshold_symbol": "1.0",
+      "comparison_result": true,
+      "both_inputs_finite": false,
+      "proposed_finite_guard_accepts": false
+    },
+    {
+      "id": "threshold_nan_ne_one",
+      "observed_symbol": "1.0",
+      "operator": "!=",
+      "threshold_symbol": "nan",
+      "comparison_result": true,
+      "both_inputs_finite": false,
+      "proposed_finite_guard_accepts": false
+    }
+  ]
+}

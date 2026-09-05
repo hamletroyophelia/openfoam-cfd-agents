@@ -10,3 +10,10 @@ build/
 runs/
 .idea/
 .vscode/
+wheel-test/
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+.env
+.env.*

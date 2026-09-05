@@ -48,7 +48,7 @@ def test_parallel_plan_uses_argument_lists_and_foamrun_for_v14(tmp_path: Path) -
 
     plan = local.LocalOpenFoamAdapter().build_run_plan(case_path, processes=4)
 
-    assert plan.commands[0].argv == ["decomposePar", "-case", str(case_path), "-force"]
+    assert plan.commands[0].argv == ["decomposePar", "-case", str(case_path)]
     assert plan.commands[1].argv == [
         "mpirun",
         "-np",
