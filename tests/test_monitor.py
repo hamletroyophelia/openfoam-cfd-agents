@@ -66,3 +66,12 @@ def test_fatal_error_forces_failed_status_even_when_numeric_values_are_small() -
     assert result.status.value == "failed"
     assert result.metrics["fatal_errors"] == 1
     assert "fieldMinMax" in result.metrics["fatal_error_messages"][0]
+
+
+def test_sigfpe_startup_banner_is_healthy_but_real_exception_is_fatal():
+    monitor = _monitor_module()
+    banner = 'sigFpe : Enabling floating point exception trapping (FOAM_SIGFPE).\n'
+    assert monitor.MonitorAgent().evaluate_text(banner + GOOD_LOG).status.value == 'passed'
+    for failure in ('Floating point exception (core dumped)', '[rank 1] Signal: Floating point exception (8)',
+                    banner.strip() + ' FOAM FATAL ERROR: broken'):
+        assert monitor.parse_solver_log(failure).fatal_error_count == 1

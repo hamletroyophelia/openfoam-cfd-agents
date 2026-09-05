@@ -51,3 +51,23 @@ def test_plan_run_keeps_a_case_path_with_spaces_as_one_argument(tmp_path: Path) 
     assert result.exit_code == 0, result.output
     payload = json.loads(output.read_text(encoding="utf-8"))
     assert payload["commands"][1]["argv"][-1] == str(case_path.resolve())
+
+
+def test_jobs_cli_submission_is_idempotent_and_does_not_start_processes(tmp_path, monkeypatch):
+    from openfoam_cfd_agents.adapters.openfoam.local import LocalOpenFoamAdapter
+    monkeypatch.setenv('MY_SECRET', 'must-not-be-persisted')
+    monkeypatch.setenv('WM_PROJECT_VERSION', '14')
+    plan_file = tmp_path / 'plan.json'
+    plan_file.write_text(LocalOpenFoamAdapter().build_run_plan(tmp_path).model_dump_json())
+    db = tmp_path / 'jobs.sqlite'
+    args = ['jobs', 'submit', str(plan_file), '--db', str(db), '--revision', 'r1', '--key', 'k1']
+    first = CliRunner().invoke(_app(), args)
+    assert first.exit_code == 0, first.output
+    assert CliRunner().invoke(_app(), args).output == first.output
+    jid = json.loads(first.output)['job_id']
+    result = CliRunner().invoke(_app(), ['jobs', 'cancel', jid, '--db', str(db)])
+    assert json.loads(result.output)['status'] == 'cancelled'
+    from openfoam_cfd_agents.jobs import JobLedger
+    spec = json.loads(JobLedger(db).get('local', 'default', jid)['spec'])
+    assert 'MY_SECRET' not in spec['environment']
+    assert spec['environment']['WM_PROJECT_VERSION'] == '14'

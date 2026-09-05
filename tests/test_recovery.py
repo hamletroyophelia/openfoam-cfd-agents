@@ -86,3 +86,10 @@ def test_new_job_cannot_inherit_previous_job_progress():
 def test_field_inventory_preserves_time_scheme_commas():
     from openfoam_cfd_agents.reliability.checkpoints import parse_field_list
     assert parse_field_list('["U", "CrankNicolson:ddt0(rho,U)"]') == ['U', 'CrankNicolson:ddt0(rho,U)']
+
+
+def test_shared_memory_plan_declares_all_host_slots(tmp_path):
+    from openfoam_cfd_agents.adapters.openfoam.local import LocalOpenFoamAdapter
+    plan = LocalOpenFoamAdapter().build_run_plan(tmp_path, processes=8, shared_memory_mpi=True)
+    argv = plan.commands[1].argv
+    assert argv[argv.index('--host') + 1] == 'localhost:8'

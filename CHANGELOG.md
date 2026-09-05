@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.3.0 — 2026-09-05
+
+- Connect the SQLite ledger to a Linux systemd `WorkerAgent` with persistent
+  launch intents, invocation reconciliation and cancellation after verified group exit.
+- Add trusted-local `jobs submit/status/cancel/worker` commands, bounded runtime,
+  case-file locking, existing-writer checks and preserved execution artifacts.
+- Add real-service integration tests for worker death, interrupted launch, nonzero
+  exit and descendant cancellation; provide a resident-controller service template.
+- Distinguish the exact healthy OpenFOAM sigFpe banner from actual exceptions.
+- Declare `localhost:N` MPI slots for the Open MPI 4 single-host transport profile.
+- Document the separately authorized cylinder checkpoint recovery, retained sphere
+  process, and boundaries between process control and scientific acceptance.
+
 ## 0.2.0 — 2026-09-05
 
 - Fail closed for NaN/Inf and invalid numeric thresholds; persist invalid locations in strict JSON.

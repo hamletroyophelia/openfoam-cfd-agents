@@ -29,6 +29,7 @@ _CONTINUITY_RE = re.compile(
 )
 _FATAL_MARKERS = ("FOAM FATAL", "MPI_ABORT", "Segmentation fault", "Floating point exception",
                   "Connection reset by peer", "mca_btl_tcp", "MPI_ERR", "out of memory")
+_SIGFPE_BANNER = re.compile(r'^sigFpe\s*:\s*Enabling floating point exception trapping \(FOAM_SIGFPE\)\.$')
 
 
 class ResidualSample(BaseModel):
@@ -102,7 +103,7 @@ def parse_solver_lines(lines: Iterable[str]) -> SolverLogSummary:
     terminal_residuals = {}
     for raw in lines:
         line = raw.strip()
-        if any(marker.casefold() in line.casefold() for marker in _FATAL_MARKERS):
+        if not _SIGFPE_BANNER.fullmatch(line) and any(marker.casefold() in line.casefold() for marker in _FATAL_MARKERS):
             data['fatal_error_count'] += 1
             if len(data['fatal_errors']) < 50:
                 data['fatal_errors'].append(line[:1000])

@@ -149,7 +149,7 @@ class LocalOpenFoamAdapter:
         if processes == 1:
             commands = [CommandSpec(argv=[self.application, "-case", cwd], cwd=cwd)]
         else:
-            transport = ['--host', 'localhost', '--mca', 'pml', 'ob1', '--mca', 'btl', 'self,vader'] if shared_memory_mpi else []
+            transport = ['--host', f'localhost:{processes}', '--mca', 'pml', 'ob1', '--mca', 'btl', 'self,vader'] if shared_memory_mpi else []
             commands = [
                 CommandSpec(argv=["decomposePar", "-case", cwd], cwd=cwd),
                 CommandSpec(

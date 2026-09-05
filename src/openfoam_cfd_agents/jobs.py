@@ -95,6 +95,19 @@ class JobLedger:
         with self._db() as db:
             return dict(self._authorized(db, principal, project, job_id))
 
+    def list_active(self, principal: str, project: str) -> list[dict]:
+        with self._db() as db:
+            return [dict(row) for row in db.execute(
+                "SELECT * FROM jobs WHERE principal=? AND project=? AND status NOT IN "
+                "('completed','failed','cancelled') ORDER BY rowid", (principal, project))]
+
+    def request_cancel(self, principal: str, project: str, job_id: str) -> dict:
+        row = self.get(principal, project, job_id)
+        if row['status'] in _TERMINAL or row['status'] == 'cancel_requested':
+            return row
+        return self.transition(principal, project, job_id, expected=row['status'],
+                               status='cancelled' if row['status'] == 'queued' else 'cancel_requested')
+
     def events(self, principal: str, project: str, job_id: str) -> list[dict]:
         with self._db() as db:
             self._authorized(db, principal, project, job_id)

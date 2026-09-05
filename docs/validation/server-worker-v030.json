@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "package_version": "0.3.0",
+  "observed_at": "2026-09-05T10:21:55.183490+00:00",
+  "platform": {
+    "python": "3.12.14",
+    "systemd": 249,
+    "openfoam": "Foundation 14",
+    "openmpi": "4.1.2"
+  },
+  "tests": {
+    "windows": {
+      "passed": 104,
+      "skipped_linux_flock": 1
+    },
+    "linux": {
+      "passed": 105
+    },
+    "installed_wheel_process_integration": {
+      "worker_restart_survival": true,
+      "nonzero_exit": true,
+      "interrupted_launch_reconciled": true,
+      "cancel_descendants": true,
+      "runtime_budget_enforced": true
+    }
+  },
+  "deployment": {
+    "worker_active": true,
+    "readonly_observers_active": 2,
+    "solver_ownership": "existing tmux; no production job adopted by worker"
+  },
+  "cylinder_recovery": {
+    "checkpoint_time": 290,
+    "target_time": 300,
+    "required_fields": [
+      "U",
+      "U_0",
+      "nut",
+      "p",
+      "phi",
+      "phi_0"
+    ],
+    "rank_count": 8,
+    "previous_ranks_exited": true,
+    "mpi_ring_allreduce_preflight": true,
+    "transport": "Open MPI 4 ob1 self,vader localhost:8",
+    "old_log_and_control_dictionary_preserved": true
+  },
+  "physical_core_allocation": {
+    "cylinder_ranks": 8,
+    "sphere_ranks": 104,
+    "overlap": false
+  },
+  "observations": {
+    "cylinder": {
+      "identity_preserved_since_deployment": true,
+      "status": "passed",
+      "progress": {
+        "process_alive": true,
+        "target_reached": false,
+        "clean_target_exit": false,
+        "latest_completed_time": 290.49,
+        "seconds_since_advance": 0.0,
+        "progress_observed": 1,
+        "regressed": 0,
+        "within_stall_window": 1,
+        "execution_viable": 1,
+        "finite_time": 1
+      },
+      "numerical": {
+        "time_steps": 50,
+        "completed_time_steps": 49,
+        "time_advances": 49,
+        "time_regressions": 0,
+        "fatal_errors": 0,
+        "fatal_error_messages": [],
+        "nonfinite_samples": 0,
+        "evidence_kind": "numerical_log_health",
+        "latest_time": 290.5,
+        "max_courant": 0.29443079,
+        "max_abs_cumulative_continuity_error": 1.4033544e-15,
+        "max_final_residual": 9.9994056e-09,
+        "residual_scope": "last_solve_per_field_per_completed_step"
+      }
+    },
+    "sphere": {
+      "identity_preserved_since_deployment": true,
+      "status": "passed",
+      "progress": {
+        "process_alive": true,
+        "target_reached": false,
+        "clean_target_exit": false,
+        "latest_completed_time": 2.6805687823,
+        "seconds_since_advance": 0.0,
+        "progress_observed": 1,
+        "regressed": 0,
+        "within_stall_window": 1,
+        "execution_viable": 1,
+        "finite_time": 1
+      },
+      "numerical": {
+        "time_steps": 1415,
+        "completed_time_steps": 1414,
+        "time_advances": 1414,
+        "time_regressions": 0,
+        "fatal_errors": 0,
+        "fatal_error_messages": [],
+        "nonfinite_samples": 0,
+        "evidence_kind": "numerical_log_health",
+        "latest_time": 2.6806259263,
+        "max_courant": 0.89887805,
+        "max_abs_cumulative_continuity_error": 4.8584267e-08,
+        "max_final_residual": 9.9177354e-07,
+        "residual_scope": "last_solve_per_field_per_completed_step",
+        "max_interface_courant": 0.47461223,
+        "alpha_min": -3.9667457e-22,
+        "alpha_max": 1.0000022
+      }
+    }
+  },
+  "limits": [
+    "Process-control tests use disposable Python jobs, not a worker-launched production solve.",
+    "Numerical health is not physical validation or final case completion.",
+    "Readonly monitoring uses a 2 MiB tail and persisted progress; it is not full-history coverage.",
+    "Sphere alpha tolerance 0.001 is taken from its existing production monitor; case-specific limits are not universal."
+  ]
+}

@@ -1,13 +1,14 @@
 # OpenFOAM CFD Agents
 
-[English](README.md) · [0.2.0 实现与边界](docs/RELIABILITY_V2.md) · [原始 V2 蓝图](docs/blueprint-v2-original/README.md)
+[English](README.md) · [0.3.0 常驻 worker](docs/WORKER_V3.md) · [原始 V2 蓝图](docs/blueprint-v2-original/README.md)
 
 面向 **Foundation OpenFOAM v14** 的确定性 CFD 工作流核心。Agent 可以提出建议，
-阶段是否通过由数值规则决定。当前提供可靠性工具和适配器，完整无人值守建模、
-常驻作业 worker、调度器及科学分析流水线仍在规划中。
+阶段是否通过由数值规则决定。当前提供可靠性工具、适配器及 Linux systemd 常驻
+作业 worker；完整无人值守建模、资源调度和科学分析流水线仍在规划中。
 
-本版结合服务器小球与圆柱算例，修复 NaN/Inf 误放行、v14 时间格式漏读和 MPI
-通信错误漏报，增加检查点候选检查、物理核冲突检测、持久进度观察和 SQLite 作业账本。
+本版把 SQLite 作业账本接入真实执行后端，支持持久提交、worker 重启后核对、
+按进程身份取消及日志保存；结合圆柱恢复修正 FPE 启动提示误报和 MPI 主机槽位。
+0.2.0 的检查点、物理核检查、持久进度和有限数值规则继续保留。
 
 ## 安装
 
@@ -66,8 +67,9 @@ cfd-workflow plan-run /path/to/case --processes 4 --restart-time 1.0 \
 
 ## 交付状态
 
-新实现和负向测试以 [可靠性说明](docs/RELIABILITY_V2.md) 为准；蓝图中的 24 项
-验收规范没有全部转化为端到端能力。作业账本及证据依赖目前是 Python 库接口，
-未接入常驻 worker 或认证网关。服务器验证为隔离的只读检查，没有重启生产算例。
+使用 `cfd-workflow jobs submit/status/cancel/worker` 管理受信本地作业，具体安装、
+常驻服务、验证和限制见 [worker 说明](docs/WORKER_V3.md)。蓝图的 24 项验收尚未全部
+覆盖，认证网关和自动科学验收仍未实现。服务器圆柱已按授权单独恢复；小球保留原进程。
+两个生产求解器继续使用原有 tmux 托管，新 worker 的生命周期验证使用隔离测试进程。
 
 Apache-2.0，见 [LICENSE](LICENSE)。不随仓库发布服务器密钥、原始大体场或专属主机配置。

@@ -1,6 +1,6 @@
 # OpenFOAM CFD Agents
 
-[中文说明](README.zh-CN.md) · [0.2.0 reliability and acceptance coverage](docs/RELIABILITY_V2.md) · [Changelog](CHANGELOG.md)
+[中文说明](README.zh-CN.md) · [0.3.0 durable worker](docs/WORKER_V3.md) · [Changelog](CHANGELOG.md)
 
 An auditable, reproducible multi-agent workflow for the full lifecycle of OpenFOAM CFD cases. The current runtime profile targets **Foundation OpenFOAM v14**. Ports and adapters keep the core open to SU2, Fluent, STAR-CCM+, schedulers, and external agent systems.
 
@@ -28,7 +28,7 @@ An auditable, reproducible multi-agent workflow for the full lifecycle of OpenFO
 | openfoam-mcp Adapter | Maps preflight, case validation, serial/parallel execution, and status queries to its real `params` contracts |
 | CLI | Configuration validation, log monitoring, mesh verification, run-plan generation, and report rendering |
 | Reliability tools | Live completed-time progress, PID identity, MPI error detection, checkpoint candidates, physical-core conflicts and runtime availability probes |
-| Local job ledger | Transactional idempotency, case-writer reservations and explicit transition contracts; Python API only, no durable worker |
+| Durable local worker | SQLite idempotency, systemd process ownership, restart reconciliation, scoped status/cancel CLI and cgroup exit verification; Linux execution |
 | Evidence contracts | Dependency-based reuse and approval scopes; Python API only, not yet connected to automatic revision capture |
 
 Not yet implemented: production Physics, Case Builder, Mesh, HPC, Statistics, Postprocess, and independent Reviewer agents; an LLM provider; live automatic solver termination; SLURM/PBS; HTML/PDF reports; and a complete Foundation v14 template library.

@@ -1,0 +1,12 @@
+[Unit]
+Description=OpenFOAM CFD Agents local job controller
+
+[Service]
+Type=simple
+ExecStart=%h/.local/share/cfd-agents/venv/bin/cfd-workflow jobs worker --db %h/.local/state/cfd-agents/jobs.sqlite --spool %h/.local/state/cfd-agents/spool
+Restart=on-failure
+RestartSec=5
+UMask=0077
+
+[Install]
+WantedBy=default.target

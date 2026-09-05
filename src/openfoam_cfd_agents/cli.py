@@ -18,6 +18,7 @@ from openfoam_cfd_agents.config import load_config
 from openfoam_cfd_agents.domain import StageStatus
 from openfoam_cfd_agents.reliability.cli import register
 from openfoam_cfd_agents.reliability.checkpoints import parse_field_list
+from openfoam_cfd_agents.job_cli import app as job_app
 
 
 app = typer.Typer(
@@ -26,6 +27,7 @@ app = typer.Typer(
     no_args_is_help=True,
 )
 register(app)
+app.add_typer(job_app, name='jobs')
 
 
 def _write_json(payload: object, output: Path | None) -> None:

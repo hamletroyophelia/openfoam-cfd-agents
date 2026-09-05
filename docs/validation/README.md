@@ -1,6 +1,20 @@
-# Release validation — 2026-09-05
+# Release validation
 
-## Automated tests
+## 0.3.0 — 2026-09-05
+
+[server-worker-v030.json](server-worker-v030.json) records the installed wheel's
+five real systemd lifecycle checks, the resident worker and two read-only observers,
+and the separately authorized cylinder recovery. Windows: **104 passed, 1 Linux-only
+test skipped**. Linux: **105 passed**. Production processes remain in their existing
+tmux sessions; they were not migrated to the worker. Both observers passed after
+actual completed-time advancement. These facts do not establish final CFD validity.
+
+The record below is the preserved **0.2.0 historical snapshot**, taken before that
+recovery. Its strict demonstration alpha gate was not the sphere's production policy.
+
+## 0.2.0 — 2026-09-05
+
+### Automated tests
 
 - Windows, Python 3.12.10: **89 passed**.
 - Linux isolated scratch environment, Python 3.12.14: **89 passed**.
@@ -13,7 +27,7 @@ framing, incomplete checkpoints, time-scheme field names containing commas,
 physical-core collisions, concurrent SQLite submissions, guarded transitions and
 evidence dependency invalidation. These are synthetic/contract tests, not CFD solves.
 
-## Live read-only inspection
+### Live read-only inspection
 
 Actual runtime: Foundation OpenFOAM 14, build `14-7b05503f98a8`, Open MPI 4.1.2.
 The validation code and Python dependencies ran in a separate scratch environment.
