@@ -1,6 +1,6 @@
 # OpenFOAM CFD Agents
 
-[English](README.md) · [0.3.0 常驻 worker](docs/WORKER_V3.md) · [原始 V2 蓝图](docs/blueprint-v2-original/README.md)
+[English](README.md) · [0.4.0 科学可视化样板](examples/cylinder-t300/README.md) · [原始 V2 蓝图](docs/blueprint-v2-original/README.md)
 
 面向 **Foundation OpenFOAM v14** 的确定性 CFD 工作流核心。Agent 可以提出建议，
 阶段是否通过由数值规则决定。当前提供可靠性工具、适配器及 Linux systemd 常驻
@@ -9,6 +9,12 @@
 本版把 SQLite 作业账本接入真实执行后端，支持持久提交、worker 重启后核对、
 按进程身份取消及日志保存；结合圆柱恢复修正 FPE 启动提示误报和 MPI 主机槽位。
 0.2.0 的检查点、物理核检查、持久进度和有限数值规则继续保留。
+
+0.4.0 增加只读算例后处理：严格核对全部分区和完整时间步，用 ParaView `pvbatch`
+输出固定色标的速度、涡量和真实三维 Q* 图，并用独立 Python 环境分析原始 Cd 历史。
+[圆柱 t=300 样板](examples/cylinder-t300/README.md)包含 3200×1800 图、原始提取数据、
+ParaView 状态、静态图集、manifest 和逐图 QA；可复用流程位于
+`.agents/skills/cfd-visualization/SKILL.md`。
 
 ## 安装
 

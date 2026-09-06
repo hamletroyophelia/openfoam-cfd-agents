@@ -1,0 +1,51 @@
+{
+  "quantity": "Cd",
+  "transform": "none; raw samples retained",
+  "merge_rules": [
+    {
+      "path": "forceCoeffs-old.dat",
+      "start_inclusive": null,
+      "stop_exclusive": 290.0
+    },
+    {
+      "path": "forceCoeffs-recovery.dat",
+      "start_inclusive": 290.0,
+      "stop_exclusive": null
+    }
+  ],
+  "total_samples": 30001,
+  "missing_values": 0,
+  "time_regressions_after_merge": 0,
+  "raw_extrema": {
+    "minimum": -146.679836,
+    "minimum_time": 0.02,
+    "maximum": 326.145715,
+    "maximum_time": 0.01,
+    "handling": "retained in the overview; no clipping or smoothing"
+  },
+  "statistics": {
+    "mean": 1.3857174272283335,
+    "standard_deviation": 0.007505791765412132,
+    "time_start": 240.0,
+    "time_end": 300.0,
+    "duration": 60.0,
+    "confidence_level": 0.95,
+    "confidence_interval": null,
+    "effective_sample_size": 28.87158169547652,
+    "integrated_autocorrelation_samples": 207.8514458714332,
+    "uncertainty_warning": "insufficient independent samples for a defensible confidence interval",
+    "sampling": {
+      "count": 6001,
+      "uniform": true,
+      "minimum_interval": 0.009999999999990905,
+      "maximum_interval": 0.010000000000047748,
+      "median_interval": 0.009999999999990905
+    }
+  },
+  "outputs": [
+    "figures/cd_history.png",
+    "figures/cd_history.svg",
+    "figures/cd_history.pdf",
+    "data/force_coefficients.csv"
+  ]
+}

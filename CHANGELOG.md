@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0 — 2026-09-06
+
+- Add a reusable, case-read-only CFD visualization workflow with strict decomposed-time audits and explicit resource limits.
+- Render fixed-scale velocity, signed vorticity and full-3D Q* figures through ParaView pvbatch, with a portable state and compact raw slice extract.
+- Merge force-history branches without silent duplicate replacement and plot the full raw history plus an explicit, unsmoothed statistics window.
+- Publish the real cylinder t=300 sample as 3200x1800 PNGs, SVG/PDF curves, a static gallery, manifest and visual QA report.
+- Add `.agents/skills/cfd-visualization` with templates, publication style, renderer, bundle builder and integrity validator.
+
 ## 0.3.0 — 2026-09-05
 
 - Connect the SQLite ledger to a Linux systemd `WorkerAgent` with persistent

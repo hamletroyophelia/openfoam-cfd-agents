@@ -1,6 +1,6 @@
 # OpenFOAM CFD Agents
 
-[中文说明](README.zh-CN.md) · [0.3.0 durable worker](docs/WORKER_V3.md) · [Changelog](CHANGELOG.md)
+[中文说明](README.zh-CN.md) · [0.4.0 visualization sample](examples/cylinder-t300/README.md) · [Changelog](CHANGELOG.md)
 
 An auditable, reproducible multi-agent workflow for the full lifecycle of OpenFOAM CFD cases. The current runtime profile targets **Foundation OpenFOAM v14**. Ports and adapters keep the core open to SU2, Fluent, STAR-CCM+, schedulers, and external agent systems.
 
@@ -30,8 +30,9 @@ An auditable, reproducible multi-agent workflow for the full lifecycle of OpenFO
 | Reliability tools | Live completed-time progress, PID identity, MPI error detection, checkpoint candidates, physical-core conflicts and runtime availability probes |
 | Durable local worker | SQLite idempotency, systemd process ownership, restart reconciliation, scoped status/cancel CLI and cgroup exit verification; Linux execution |
 | Evidence contracts | Dependency-based reuse and approval scopes; Python API only, not yet connected to automatic revision capture |
+| Scientific visualization | Read-only decomposed-time audit, pvbatch velocity/vorticity/Q* rendering, force-history statistics, fixed styling, manifest, gallery and visual QA bundle |
 
-Not yet implemented: production Physics, Case Builder, Mesh, HPC, Statistics, Postprocess, and independent Reviewer agents; an LLM provider; live automatic solver termination; SLURM/PBS; HTML/PDF reports; and a complete Foundation v14 template library.
+Not yet implemented: production Physics, Case Builder, Mesh, HPC and independent Reviewer agents; an LLM provider; live automatic solver termination; SLURM/PBS; general HTML/PDF reports; batch animations; and a complete Foundation v14 template library.
 
 ## Architecture
 
@@ -63,7 +64,11 @@ cfd-workflow validate-config .\config\default.yaml
 cfd-workflow monitor .\examples\phase1\log.foamRun --output .\runs\demo\monitor.json
 cfd-workflow verify-mesh .\examples\phase1\mesh-study.yaml --output .\runs\demo\mesh-verification.json
 cfd-workflow plan-run 'D:\cases\case with spaces' --processes 16 --output .\runs\demo\run-plan.json
+cfd-workflow visualize audit 'D:\derived-case-view' .\viz.yaml --output .\case-audit.json --safety-age-seconds 120
+cfd-workflow visualize prepare .\viz.yaml --output .\viz.resolved.json
 ```
+
+Install `.[visualization]` for NumPy, SciPy and Matplotlib analysis. Field rendering uses a separate ParaView `pvbatch`; the project does not modify system Python, OpenFOAM or MPI. See the [real t=300 cylinder gallery](examples/cylinder-t300/gallery/index.html) and the reusable [CFD visualization skill](.agents/skills/cfd-visualization/SKILL.md).
 
 Before actual OpenFOAM execution, the host must load Foundation v14 so that `WM_PROJECT_DIR`, `WM_PROJECT_VERSION=14`, `foamRun`, `blockMesh`, and `checkMesh` are available. Windows can run the analysis, verification, and reporting tools. Solving normally runs on a configured Linux host, container, or HPC node.
 
@@ -114,6 +119,7 @@ openfoam cfd agents/
 ├── config/                       # Workflow configuration
 ├── docs/                         # Architecture, diagrams, and upstream study
 ├── examples/phase1/              # CLI smoke-test inputs
+├── examples/cylinder-t300/       # Real first-stage figures, data, state, gallery and QA
 ├── src/openfoam_cfd_agents/
 │   ├── agents/                   # Supervisor, Monitor, Verification, Report
 │   ├── adapters/openfoam/        # Local v14, Foam-Agent MCP, openfoam-mcp

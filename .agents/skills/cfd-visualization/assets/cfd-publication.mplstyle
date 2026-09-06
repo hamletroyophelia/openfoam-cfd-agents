@@ -1,0 +1,23 @@
+figure.facecolor: FBFCFE
+axes.facecolor: white
+axes.edgecolor: 102A43
+axes.labelcolor: 16202A
+axes.titlecolor: 102A43
+axes.titlesize: 18
+axes.labelsize: 15
+axes.grid: True
+grid.color: CDD5DF
+grid.linewidth: 0.6
+grid.alpha: 0.8
+font.family: sans-serif
+font.sans-serif: Arial, DejaVu Sans
+font.size: 14
+legend.frameon: False
+legend.fontsize: 13
+lines.linewidth: 1.4
+savefig.facecolor: FBFCFE
+savefig.bbox: tight
+svg.fonttype: none
+pdf.fonttype: 42
+xtick.labelsize: 13
+ytick.labelsize: 13

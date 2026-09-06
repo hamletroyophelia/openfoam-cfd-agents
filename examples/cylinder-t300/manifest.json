@@ -1,0 +1,252 @@
+{
+  "schema_version": 1,
+  "title": "Cylinder Re=100: first-stage scientific visualization",
+  "release": "0.4.0",
+  "created_at": "2026-09-06T16:03:45+08:00",
+  "source": {
+    "case_id": "cylinder_Re100_LES_WALE_Lz4D_v14force_20260902",
+    "source_policy": "read-only; audited time and mesh copied to a separate local derived case view",
+    "openfoam_profile": "Foundation OpenFOAM v14",
+    "selected_time": 300.0,
+    "expected_partitions": 8,
+    "actual_partitions": 8,
+    "read_partitions": 8,
+    "postprocess_processes": 1,
+    "fields": [
+      "U",
+      "p",
+      "nut"
+    ],
+    "complete_time_evidence": "data/case-audit.json"
+  },
+  "physics": {
+    "mesh_dimension": 3,
+    "mesh_bounds_m": [
+      -20.0,
+      30.0,
+      -20.0,
+      20.0,
+      -4.0,
+      4.0
+    ],
+    "cells": 2944000,
+    "streamwise": "+x",
+    "cross_stream": "+y",
+    "spanwise": "+z",
+    "gravity": null,
+    "gravity_note": "not defined or applicable in this single-phase cylinder case",
+    "body_diameter_m": 2.0,
+    "body_span_m": 8.0,
+    "submergence": null,
+    "reference_velocity_m_per_s": 1.0,
+    "reference_length_m": 2.0
+  },
+  "software": {
+    "paraview": "5.12.1",
+    "vtk": "9.3.20231030",
+    "renderer": "Intel Iris Xe Graphics, OpenGL 4.5, offscreen=true",
+    "osmesa": "not used; the offscreen OpenGL smoke test passed",
+    "python_analysis": "isolated project .venv",
+    "numpy": "2.5.2",
+    "scipy": "1.18.1",
+    "matplotlib": "3.11.1"
+  },
+  "render": {
+    "resolution": [
+      3200,
+      1800
+    ],
+    "preview_resolution": [
+      1280,
+      720
+    ],
+    "extract_resolution": [
+      640,
+      360
+    ],
+    "roi_m": [
+      -6.0,
+      18.0,
+      -6.75,
+      6.75,
+      -4.0,
+      4.0
+    ],
+    "slice": "z=0 m",
+    "velocity_range_m_per_s": [
+      0.0,
+      1.5
+    ],
+    "vorticity_range_per_s": [
+      -1.0,
+      1.0
+    ],
+    "qstar_threshold": 0.2,
+    "q_dimensional_threshold_per_s2": 0.05,
+    "gradient": "computed from full 3D cell U before interpolation and slicing",
+    "phase_mask": null,
+    "geometry_simplification": "none; analytic cylinder overlay only",
+    "resources": {
+      "processes": 1,
+      "threads": 1,
+      "memory_budget_gib": 12.0,
+      "measured_preview_peak_gib": 2.13,
+      "measured_final_peak_gib": 5.45,
+      "measured_preview_seconds": 31.75,
+      "measured_final_seconds": 90.97
+    }
+  },
+  "statistics": {
+    "window_s": [
+      240.0,
+      300.0
+    ],
+    "raw_samples": 30001,
+    "window_samples": 6001,
+    "merge": "old segment t<290; recovery segment t>=290; conflicting duplicates fail",
+    "smoothing": "none",
+    "time_weighted_cd_mean": 1.3857174272283335,
+    "time_weighted_cd_standard_deviation": 0.007505791765412132,
+    "effective_sample_size": 28.87158169547652,
+    "confidence_interval": null,
+    "uncertainty_warning": "insufficient independent samples for a defensible confidence interval",
+    "spectrum": "not produced in this first-stage bundle"
+  },
+  "warnings": [
+    "The fixed vorticity scale saturates values outside [-1, 1] 1/s; actual sampled extrema are approximately [-6.90, 7.21] 1/s.",
+    "Visible angular transitions near the cylinder follow mesh-resolution transitions and persist across independent sampling checks; no smoothing was applied.",
+    "Startup Cd impulses at t=0.01 and 0.02 s are retained in the overview and excluded only by the declared statistics window.",
+    "The portable pvsm stores cylinder.foam as a relative placeholder and requires relinking to the derived case view when opened."
+  ],
+  "acceptance": {
+    "visual_review": "passed after opening the final PNGs at full and reduced size",
+    "final_pngs": [
+      "figures/velocity_magnitude_t300.png",
+      "figures/vorticity_spanwise_t300.png",
+      "figures/qcriterion_qstar0.2_t300.png"
+    ]
+  },
+  "gallery": [
+    {
+      "path": "figures/velocity_magnitude_t300.png",
+      "name": "Velocity magnitude",
+      "alt": "Centre-plane velocity magnitude around a circular cylinder",
+      "caption": "Orthographic z=0 slice; fixed 0 to 1.5 m/s sequential scale."
+    },
+    {
+      "path": "figures/vorticity_spanwise_t300.png",
+      "name": "Spanwise vorticity",
+      "alt": "Centre-plane signed spanwise vorticity wake",
+      "caption": "Zero-centred diverging scale; saturation is disclosed in the manifest."
+    },
+    {
+      "path": "figures/qcriterion_qstar0.2_t300.png",
+      "name": "Three-dimensional Q*",
+      "alt": "Three-dimensional Q-star isosurfaces coloured by spanwise vorticity",
+      "caption": "Q* = 0.2 from the full three-dimensional velocity gradient; domain shell and partition boundaries hidden."
+    },
+    {
+      "path": "figures/cd_history.png",
+      "name": "Raw drag history",
+      "alt": "Raw drag coefficient history and unsmoothed statistics window",
+      "caption": "All startup impulses retained; the lower panel shows the explicit 240 to 300 second statistics window."
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "viz.yaml",
+      "bytes": 1141,
+      "sha256": "254e6867aaeebfdcf3b24356120b92e6d264836865624c69194dc110fa0b8655"
+    },
+    {
+      "path": "cfd-publication.mplstyle",
+      "bytes": 486,
+      "sha256": "408148a33ed4e9739c15f1d469641d63d2400b052f0232f4889832d6ffe7511a"
+    },
+    {
+      "path": "data/case-audit.json",
+      "bytes": 1756,
+      "sha256": "efdb92ee4432a19cc7b8e86410877776b11523b80f1faa261dda34aed2d25375"
+    },
+    {
+      "path": "data/render_summary.json",
+      "bytes": 2124,
+      "sha256": "d0155dbd3ba1f762e82650badf13995300563a1370552f24b03921c570d42e74"
+    },
+    {
+      "path": "data/force_summary.json",
+      "bytes": 1454,
+      "sha256": "376405fae7baa90d254c389ef098672815ab010d52e001d3ddb171adde654e2e"
+    },
+    {
+      "path": "data/centre_slice_t300.csv",
+      "bytes": 6691269,
+      "sha256": "1872db5c6c31d065be91385e49e8482f4faebb068f5af7f90193244098719dca"
+    },
+    {
+      "path": "data/force_coefficients.csv",
+      "bytes": 2887681,
+      "sha256": "4a7aa4b4cedec65a4d8c1c2426a0ae05c4c32412ff50d0a23d4d954b8e6989d8"
+    },
+    {
+      "path": "figures/velocity_magnitude_t300.png",
+      "bytes": 709523,
+      "sha256": "7f14c1a10882b51a9bc77c93dafd7664a387a01006c563f0b833bb4778c7e397"
+    },
+    {
+      "path": "figures/vorticity_spanwise_t300.png",
+      "bytes": 608579,
+      "sha256": "97a59f3d3855c1fda689b99525d647b62783c99fd87148ceb132b3a0cea020f8"
+    },
+    {
+      "path": "figures/qcriterion_qstar0.2_t300.png",
+      "bytes": 117779,
+      "sha256": "a89193b1be68dc73d605c226cc51b21fee4d62b2962d5e77aed7d2f5707b5948"
+    },
+    {
+      "path": "figures/cd_history.png",
+      "bytes": 315832,
+      "sha256": "46a0dd81425db03bcf670ac65ec9750d7df4b3abba1186bac87d47f1771a41d0"
+    },
+    {
+      "path": "figures/cd_history.svg",
+      "bytes": 78751,
+      "sha256": "d60f56a70e1658a064a1228217857eba6753bbd3a99f5e912664ca7350689127"
+    },
+    {
+      "path": "figures/cd_history.pdf",
+      "bytes": 66272,
+      "sha256": "3e8e33af5e07a507b06f459b315c6195c55efff7cdc34ff7286503b9fdf1040f"
+    },
+    {
+      "path": "previews/velocity_magnitude_t300.png",
+      "bytes": 232590,
+      "sha256": "4830fb42b170ecae722a6b632bcc9328ddad0c12c7cb8662665f4adca1650803"
+    },
+    {
+      "path": "previews/vorticity_spanwise_t300.png",
+      "bytes": 192947,
+      "sha256": "5c744421862b3498606be222d15e29b698bbf9cc656d5fab9e0055d74626c707"
+    },
+    {
+      "path": "previews/qcriterion_qstar0.2_t300.png",
+      "bytes": 56056,
+      "sha256": "8a33ff55629afe3c34f971f595b7f49a3dc0678b1109d2ef3dae6100c88f45f3"
+    },
+    {
+      "path": "states/cylinder_t300.pvsm",
+      "bytes": 1137852,
+      "sha256": "ef778bee59b0caba83d41be8c7d1fc3b0d21120ea7f425318ef175d027587333"
+    },
+    {
+      "path": "qa_report.md",
+      "bytes": 2589,
+      "sha256": "bea0d36897df6322f3deb4e7973cd69aabfca75b464d757939474107a6591982"
+    },
+    {
+      "path": "README.md",
+      "bytes": 1331,
+      "sha256": "c72dfcb15eaf1ad35401e68e594310dea87518a260c14c2838d32239a263eb45"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+schema_version: 1
+case:
+  id: replace-with-reviewed-case-id
+  display_name: reviewed short label
+  selected_time: "0"
+  expected_partitions: 1
+  required_fields: [U, p]
+  format: decomposed
+physics:
+  reference_length: 1.0
+  reference_velocity: 1.0
+  streamwise: [1.0, 0.0, 0.0]
+  cross_stream: [0.0, 1.0, 0.0]
+  spanwise: [0.0, 0.0, 1.0]
+  gravity: null
+  body:
+    kind: cylinder
+    center: [0.0, 0.0, 0.0]
+    diameter: 1.0
+    span: 1.0
+render:
+  slice_origin: [0.0, 0.0, 0.0]
+  slice_normal: [0.0, 0.0, 1.0]
+  roi: [-3.0, 9.0, -3.375, 3.375, -0.5, 0.5]
+  resolution: [3200, 1800]
+  preview_resolution: [1280, 720]
+  data_resolution: [640, 360]
+  velocity_range: [0.0, 1.5]
+  vorticity_range: [-1.0, 1.0]
+  qstar_threshold: 0.2
+  velocity_colormap: Viridis (matplotlib)
+  vorticity_colormap: Cool to Warm
+  font_family: Arial
+  font_size: 22
+  q_camera_position: [12.0, -15.0, 10.0]
+  q_camera_focal_point: [3.0, 0.0, 0.0]
+  q_camera_view_up: [0.0, 0.0, 1.0]
+  q_camera_parallel_scale: 5.0
+statistics:
+  window: [0.0, 1.0]
+  confidence_level: 0.95
+resources:
+  processes: 1
+  threads: 1
+  memory_gib: 12.0

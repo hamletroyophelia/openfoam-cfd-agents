@@ -1,0 +1,45 @@
+schema_version: 1
+case:
+  id: cylinder_Re100_LES_WALE_Lz4D_v14force
+  display_name: Cylinder Re=100, LES WALE, Lz=4D
+  selected_time: "300"
+  expected_partitions: 8
+  required_fields: [U, p, nut]
+  format: decomposed
+physics:
+  reference_length: 2.0
+  reference_velocity: 1.0
+  streamwise: [1.0, 0.0, 0.0]
+  cross_stream: [0.0, 1.0, 0.0]
+  spanwise: [0.0, 0.0, 1.0]
+  gravity: null
+  body:
+    kind: cylinder
+    center: [0.0, 0.0, 0.0]
+    diameter: 2.0
+    span: 8.0
+render:
+  slice_origin: [0.0, 0.0, 0.0]
+  slice_normal: [0.0, 0.0, 1.0]
+  roi: [-6.0, 18.0, -6.75, 6.75, -4.0, 4.0]
+  resolution: [3200, 1800]
+  preview_resolution: [1280, 720]
+  data_resolution: [640, 360]
+  velocity_range: [0.0, 1.5]
+  vorticity_range: [-1.0, 1.0]
+  qstar_threshold: 0.2
+  velocity_colormap: Viridis (matplotlib)
+  vorticity_colormap: Cool to Warm
+  font_family: Arial
+  font_size: 22
+  q_camera_position: [16.0, -18.0, 13.0]
+  q_camera_focal_point: [5.0, 0.0, 0.0]
+  q_camera_view_up: [0.0, 0.0, 1.0]
+  q_camera_parallel_scale: 7.0
+statistics:
+  window: [240.0, 300.0]
+  confidence_level: 0.95
+resources:
+  processes: 1
+  threads: 1
+  memory_gib: 12.0

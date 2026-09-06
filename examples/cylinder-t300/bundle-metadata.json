@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "title": "Cylinder Re=100: first-stage scientific visualization",
+  "release": "0.4.0",
+  "created_at": "2026-09-06T16:03:45+08:00",
+  "source": {
+    "case_id": "cylinder_Re100_LES_WALE_Lz4D_v14force_20260902",
+    "source_policy": "read-only; audited time and mesh copied to a separate local derived case view",
+    "openfoam_profile": "Foundation OpenFOAM v14",
+    "selected_time": 300.0,
+    "expected_partitions": 8,
+    "actual_partitions": 8,
+    "read_partitions": 8,
+    "postprocess_processes": 1,
+    "fields": ["U", "p", "nut"],
+    "complete_time_evidence": "data/case-audit.json"
+  },
+  "physics": {
+    "mesh_dimension": 3,
+    "mesh_bounds_m": [-20.0, 30.0, -20.0, 20.0, -4.0, 4.0],
+    "cells": 2944000,
+    "streamwise": "+x",
+    "cross_stream": "+y",
+    "spanwise": "+z",
+    "gravity": null,
+    "gravity_note": "not defined or applicable in this single-phase cylinder case",
+    "body_diameter_m": 2.0,
+    "body_span_m": 8.0,
+    "submergence": null,
+    "reference_velocity_m_per_s": 1.0,
+    "reference_length_m": 2.0
+  },
+  "software": {
+    "paraview": "5.12.1",
+    "vtk": "9.3.20231030",
+    "renderer": "Intel Iris Xe Graphics, OpenGL 4.5, offscreen=true",
+    "osmesa": "not used; the offscreen OpenGL smoke test passed",
+    "python_analysis": "isolated project .venv",
+    "numpy": "2.5.2",
+    "scipy": "1.18.1",
+    "matplotlib": "3.11.1"
+  },
+  "render": {
+    "resolution": [3200, 1800],
+    "preview_resolution": [1280, 720],
+    "extract_resolution": [640, 360],
+    "roi_m": [-6.0, 18.0, -6.75, 6.75, -4.0, 4.0],
+    "slice": "z=0 m",
+    "velocity_range_m_per_s": [0.0, 1.5],
+    "vorticity_range_per_s": [-1.0, 1.0],
+    "qstar_threshold": 0.2,
+    "q_dimensional_threshold_per_s2": 0.05,
+    "gradient": "computed from full 3D cell U before interpolation and slicing",
+    "phase_mask": null,
+    "geometry_simplification": "none; analytic cylinder overlay only",
+    "resources": {"processes": 1, "threads": 1, "memory_budget_gib": 12.0,
+      "measured_preview_peak_gib": 2.13, "measured_final_peak_gib": 5.45,
+      "measured_preview_seconds": 31.75, "measured_final_seconds": 90.97}
+  },
+  "statistics": {
+    "window_s": [240.0, 300.0],
+    "raw_samples": 30001,
+    "window_samples": 6001,
+    "merge": "old segment t<290; recovery segment t>=290; conflicting duplicates fail",
+    "smoothing": "none",
+    "time_weighted_cd_mean": 1.3857174272283335,
+    "time_weighted_cd_standard_deviation": 0.007505791765412132,
+    "effective_sample_size": 28.87158169547652,
+    "confidence_interval": null,
+    "uncertainty_warning": "insufficient independent samples for a defensible confidence interval",
+    "spectrum": "not produced in this first-stage bundle"
+  },
+  "warnings": [
+    "The fixed vorticity scale saturates values outside [-1, 1] 1/s; actual sampled extrema are approximately [-6.90, 7.21] 1/s.",
+    "Visible angular transitions near the cylinder follow mesh-resolution transitions and persist across independent sampling checks; no smoothing was applied.",
+    "Startup Cd impulses at t=0.01 and 0.02 s are retained in the overview and excluded only by the declared statistics window.",
+    "The portable pvsm stores cylinder.foam as a relative placeholder and requires relinking to the derived case view when opened."
+  ],
+  "acceptance": {
+    "visual_review": "passed after opening the final PNGs at full and reduced size",
+    "final_pngs": ["figures/velocity_magnitude_t300.png", "figures/vorticity_spanwise_t300.png", "figures/qcriterion_qstar0.2_t300.png"]
+  },
+  "gallery": [
+    {"path": "figures/velocity_magnitude_t300.png", "name": "Velocity magnitude", "alt": "Centre-plane velocity magnitude around a circular cylinder", "caption": "Orthographic z=0 slice; fixed 0 to 1.5 m/s sequential scale."},
+    {"path": "figures/vorticity_spanwise_t300.png", "name": "Spanwise vorticity", "alt": "Centre-plane signed spanwise vorticity wake", "caption": "Zero-centred diverging scale; saturation is disclosed in the manifest."},
+    {"path": "figures/qcriterion_qstar0.2_t300.png", "name": "Three-dimensional Q*", "alt": "Three-dimensional Q-star isosurfaces coloured by spanwise vorticity", "caption": "Q* = 0.2 from the full three-dimensional velocity gradient; domain shell and partition boundaries hidden."},
+    {"path": "figures/cd_history.png", "name": "Raw drag history", "alt": "Raw drag coefficient history and unsmoothed statistics window", "caption": "All startup impulses retained; the lower panel shows the explicit 240 to 300 second statistics window."}
+  ],
+  "artifact_paths": [
+    "viz.yaml", "cfd-publication.mplstyle", "data/case-audit.json", "data/render_summary.json",
+    "data/force_summary.json", "data/centre_slice_t300.csv", "data/force_coefficients.csv",
+    "figures/velocity_magnitude_t300.png", "figures/vorticity_spanwise_t300.png",
+    "figures/qcriterion_qstar0.2_t300.png", "figures/cd_history.png", "figures/cd_history.svg",
+    "figures/cd_history.pdf", "previews/velocity_magnitude_t300.png",
+    "previews/vorticity_spanwise_t300.png", "previews/qcriterion_qstar0.2_t300.png",
+    "states/cylinder_t300.pvsm", "qa_report.md", "README.md"
+  ]
+}

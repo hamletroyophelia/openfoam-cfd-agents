@@ -1,0 +1,100 @@
+{
+  "selected_time": 300.0,
+  "available_times": [
+    300.0
+  ],
+  "mesh_bounds": [
+    -20.0,
+    30.0,
+    -20.0,
+    20.0,
+    -4.0,
+    4.0
+  ],
+  "mesh_dimension": 3,
+  "reader_cells": 2944000,
+  "slice_cells": 1440000,
+  "q_surface_cells": 102075,
+  "ranges": {
+    "Umag_actual": [
+      0.0,
+      1.3392452201775187
+    ],
+    "Vorticity_z_actual": [
+      -6.900640487670898,
+      7.20628023147583
+    ],
+    "Q_actual": [
+      -1.2502973079681396,
+      3.2614586353302
+    ]
+  },
+  "fixed_ranges": {
+    "Umag": [
+      0.0,
+      1.5
+    ],
+    "Vorticity_z": [
+      -1.0,
+      1.0
+    ]
+  },
+  "range_exceeded": {
+    "Umag": false,
+    "Vorticity_z": true
+  },
+  "qstar_threshold": 0.2,
+  "q_dimensional_threshold": 0.05,
+  "pipeline": {
+    "partition_handling": "MergeBlocks with coincident-point merging before gradients",
+    "gradient": "full 3D cell U before interpolation or slicing",
+    "interpolation": "CellDataToPointData follows the 3D Gradient; field figures and CSV probe those point fields onto a uniform ROI plane",
+    "slice": {
+      "origin": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "normal": [
+        0.0,
+        0.0,
+        1.0
+      ]
+    },
+    "q_roi_clip": [
+      -6.0,
+      18.0,
+      -6.75,
+      6.75,
+      -4.0,
+      4.0
+    ],
+    "phase_mask": null,
+    "geometry_simplification": "analytic cylinder overlay only; no source-field simplification"
+  },
+  "resolution": [
+    3200,
+    1800
+  ],
+  "preview": false,
+  "outputs": [
+    "figures/velocity_magnitude_t300.png",
+    "figures/vorticity_spanwise_t300.png",
+    "figures/qcriterion_qstar0.2_t300.png",
+    "data/centre_slice_t300.csv",
+    "states/cylinder_t300.pvsm"
+  ],
+  "renderer": {
+    "offscreen": true,
+    "capabilities": [
+      "OpenGL vendor string:  Intel",
+      "OpenGL renderer string:  Intel(R) Iris(R) Xe Graphics",
+      "OpenGL version string:  4.5.0 - Build 31.0.101.4255"
+    ]
+  },
+  "elapsed_seconds": 90.96900000000096,
+  "data_resolution": [
+    640,
+    360
+  ]
+}
