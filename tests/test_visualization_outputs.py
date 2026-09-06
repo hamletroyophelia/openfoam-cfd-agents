@@ -14,7 +14,9 @@ def test_plot_writes_raw_csv_and_three_publication_formats(tmp_path):
     summary = plot_cd_history(VisualizationConfig.model_validate(config_payload()),
                               [(force, None, None)], output)
     assert summary['total_samples'] == 301
-    assert summary['transform'].startswith('none')
+    assert summary['transform'].startswith('Cd is already dimensionless')
+    assert summary['horizontal_axis']['formula'] == 't* = t U_ref / L_ref'
+    assert summary['horizontal_axis']['statistics_window_nondimensional'] == [120.0, 150.0]
     for suffix in ('png', 'svg', 'pdf'):
         assert (output / 'figures' / f'cd_history.{suffix}').stat().st_size > 1000
     assert len((output / 'data/force_coefficients.csv').read_text().splitlines()) == 302

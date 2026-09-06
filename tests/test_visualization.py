@@ -9,7 +9,7 @@ import pytest
 
 def config_payload():
     return {
-        'schema_version': 1,
+        'schema_version': 2,
         'case': {'id': 'cylinder', 'selected_time': '300', 'expected_partitions': 2,
                  'required_fields': ['U', 'p'], 'format': 'decomposed'},
         'physics': {'reference_length': 2.0, 'reference_velocity': 1.0,
@@ -20,7 +20,7 @@ def config_payload():
         'render': {'slice_origin': [0, 0, 0], 'slice_normal': [0, 0, 1],
                    'roi': [-6, 18, -6.75, 6.75, -4, 4],
                    'resolution': [3200, 1800], 'preview_resolution': [1280, 720],
-                   'velocity_range': [0, 1.5], 'vorticity_range': [-1, 1],
+                   'velocity_star_range': [0, 1.5], 'vorticity_star_range': [-2, 2],
                    'qstar_threshold': 0.2},
         'statistics': {'window': [240, 300], 'confidence_level': 0.95},
         'resources': {'processes': 1, 'threads': 1, 'memory_gib': 12},
@@ -50,7 +50,7 @@ def test_config_rejects_guessed_or_nonorthogonal_axes():
     with pytest.raises(ValueError, match='orthonormal'):
         VisualizationConfig.model_validate(payload)
     payload = config_payload()
-    payload['render']['velocity_range'] = [1, 0]
+    payload['render']['velocity_star_range'] = [1, 0]
     with pytest.raises(ValueError):
         VisualizationConfig.model_validate(payload)
 

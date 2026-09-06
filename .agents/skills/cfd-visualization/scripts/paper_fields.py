@@ -12,6 +12,11 @@ import numpy as np
 from matplotlib.patches import Circle
 
 
+def latex_symbol(symbol):
+    return {'D': 'D', 'L_ref': r'L_{ref}', 'U_inf': r'U_\infty',
+            'U_ref': r'U_{ref}'}.get(symbol, symbol)
+
+
 def arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument('--csv', type=Path, required=True)
@@ -46,11 +51,12 @@ def load_plane(path: Path):
 
 
 def plot_field(x, y, values, config, *, key, title, symbol, panel, output, preview):
-    diameter = config['physics']['body']['diameter']
+    reference_length = config['physics']['reference_length']
     center = config['physics']['body']['center']
+    diameter = config['physics']['body']['diameter']
     render = config['render']
     limits = render[key]
-    cmap = 'viridis' if key == 'velocity_range' else 'coolwarm'
+    cmap = 'viridis' if key == 'velocity_star_range' else 'coolwarm'
     extend = 'neither' if values.min() >= limits[0] and values.max() <= limits[1] else 'both'
     dpi = 100 if preview else 200
     with plt.rc_context({
@@ -60,17 +66,23 @@ def plot_field(x, y, values, config, *, key, title, symbol, panel, output, previ
     }):
         figure_size = (12.0, 6.75) if preview else (16.0, 9.0)
         fig, axis = plt.subplots(figsize=figure_size, constrained_layout=True)
-        image = axis.pcolormesh(x / diameter, y / diameter, values, shading='auto',
+        image = axis.pcolormesh(x / reference_length, y / reference_length, values, shading='auto',
                                 cmap=cmap, vmin=limits[0], vmax=limits[1], rasterized=True)
-        axis.add_patch(Circle((center[0] / diameter, center[1] / diameter), 0.5,
+        axis.add_patch(Circle((center[0] / reference_length, center[1] / reference_length),
+                              diameter / (2 * reference_length),
                               facecolor='#111820', edgecolor='white', linewidth=0.8, zorder=5))
         axis.set_aspect('equal', adjustable='box')
-        axis.set_xlabel(r'$x/D$', labelpad=2)
-        axis.set_ylabel(r'$y/D$', labelpad=2)
+        coordinate_denominator = latex_symbol(
+            config['physics'].get('reference_length_symbol', 'L_ref'))
+        velocity_symbol = latex_symbol(
+            config['physics'].get('reference_velocity_symbol', 'U_ref'))
+        axis.set_xlabel(fr'$x/{coordinate_denominator}$', labelpad=2)
+        axis.set_ylabel(fr'$y/{coordinate_denominator}$', labelpad=2)
         axis.text(0.015, 0.975, f'({panel})  {title}', transform=axis.transAxes,
                   ha='left', va='top', color='white', fontweight='bold',
                   bbox={'facecolor': '#102A43', 'edgecolor': 'none', 'alpha': 0.88, 'pad': 4})
-        axis.annotate(r'$U_\infty$', xy=(-2.1, 2.55), xytext=(-2.85, 2.55),
+        axis.annotate(fr'${velocity_symbol}$', xy=(0.12, 0.88), xytext=(0.025, 0.88),
+                      xycoords='axes fraction', textcoords='axes fraction',
                       arrowprops={'arrowstyle': '->', 'lw': 1.2}, ha='center', va='center')
         bar = fig.colorbar(image, ax=axis, pad=0.015, fraction=0.035, aspect=28, extend=extend)
         bar.set_label(symbol, labelpad=5)
@@ -85,24 +97,36 @@ def main():
     output.mkdir(parents=True, exist_ok=False)
     config = json.loads(args.config_json.read_text(encoding='utf-8'))
     x, y, fields = load_plane(args.csv)
+    length = config['physics']['reference_length']
+    velocity = config['physics']['reference_velocity']
+    length_symbol = latex_symbol(config['physics'].get('reference_length_symbol', 'L_ref'))
+    velocity_symbol = latex_symbol(config['physics'].get('reference_velocity_symbol', 'U_ref'))
+    fields['speed'] = fields['speed'] / velocity
+    fields['vorticity'] = fields['vorticity'] * length / velocity
     suffix = 'preview' if args.preview else 'final'
     speed = output / f'velocity_magnitude_t300_paper_{suffix}.png'
     vort = output / f'vorticity_spanwise_t300_paper_{suffix}.png'
-    plot_field(x, y, fields['speed'], config, key='velocity_range',
-               title='Velocity magnitude', symbol=r'$|\mathbf{U}|/U_\infty$', panel='a',
+    plot_field(x, y, fields['speed'], config, key='velocity_star_range',
+               title='Velocity magnitude', symbol=fr'$|\mathbf{{U}}|/{velocity_symbol}$', panel='a',
                output=speed, preview=args.preview)
-    plot_field(x, y, fields['vorticity'], config, key='vorticity_range',
-               title='Spanwise vorticity', symbol=r'$\omega_z D/U_\infty$', panel='b',
+    plot_field(x, y, fields['vorticity'], config, key='vorticity_star_range',
+               title='Spanwise vorticity',
+               symbol=fr'$\omega_z {length_symbol}/{velocity_symbol}$', panel='b',
                output=vort, preview=args.preview)
     summary = {
         'input': str(args.csv.resolve()), 'outputs': [speed.name, vort.name],
-        'coordinates': 'x/D and y/D', 'colorbar_pad_fraction': 0.015,
+        'nondimensionalization': {
+            'coordinates': 'x* = x/L_ref, y* = y/L_ref',
+            'velocity': '|U|* = |U|/U_ref',
+            'vorticity': 'omega* = omega L_ref/U_ref',
+            'reference_length': length, 'reference_velocity': velocity,
+        }, 'colorbar_pad_fraction': 0.015,
         'interpolation': 'none beyond pcolormesh display of the audited rectilinear probe',
         'smoothing': None, 'actual_ranges': {
-            'speed': [float(np.nanmin(fields['speed'])), float(np.nanmax(fields['speed']))],
-            'vorticity': [float(np.nanmin(fields['vorticity'])), float(np.nanmax(fields['vorticity']))],
-        }, 'fixed_ranges': {'speed': config['render']['velocity_range'],
-                            'vorticity': config['render']['vorticity_range']},
+            'speed_star': [float(np.nanmin(fields['speed'])), float(np.nanmax(fields['speed']))],
+            'vorticity_star': [float(np.nanmin(fields['vorticity'])), float(np.nanmax(fields['vorticity']))],
+        }, 'fixed_ranges': {'speed_star': config['render']['velocity_star_range'],
+                            'vorticity_star': config['render']['vorticity_star_range']},
         'preview': args.preview,
     }
     (output / 'paper_layout_summary.json').write_text(json.dumps(summary, indent=2) + '\n', encoding='utf-8')

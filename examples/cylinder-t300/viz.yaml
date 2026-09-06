@@ -1,4 +1,4 @@
-schema_version: 1
+schema_version: 2
 case:
   id: cylinder_Re100_LES_WALE_Lz4D_v14force
   display_name: Cylinder Re=100, LES WALE, Lz=4D
@@ -9,6 +9,8 @@ case:
 physics:
   reference_length: 2.0
   reference_velocity: 1.0
+  reference_length_symbol: D
+  reference_velocity_symbol: U_inf
   streamwise: [1.0, 0.0, 0.0]
   cross_stream: [0.0, 1.0, 0.0]
   spanwise: [0.0, 0.0, 1.0]
@@ -25,8 +27,8 @@ render:
   resolution: [3200, 1800]
   preview_resolution: [1280, 720]
   data_resolution: [640, 360]
-  velocity_range: [0.0, 1.5]
-  vorticity_range: [-1.0, 1.0]
+  velocity_star_range: [0.0, 1.5]
+  vorticity_star_range: [-2.0, 2.0]
   qstar_threshold: 0.2
   velocity_colormap: Viridis (matplotlib)
   vorticity_colormap: Cool to Warm

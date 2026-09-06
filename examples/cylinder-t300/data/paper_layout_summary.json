@@ -4,35 +4,41 @@
     "velocity_magnitude_t300_paper_final.png",
     "vorticity_spanwise_t300_paper_final.png"
   ],
-  "coordinates": "x/D and y/D",
+  "nondimensionalization": {
+    "coordinates": "x* = x/L_ref, y* = y/L_ref",
+    "velocity": "|U|* = |U|/U_ref",
+    "vorticity": "omega* = omega L_ref/U_ref",
+    "reference_length": 2.0,
+    "reference_velocity": 1.0
+  },
   "colorbar_pad_fraction": 0.015,
   "source_grid": [641, 361],
   "paper_grid": [321, 181],
   "reduction": "retain every second x and y coordinate and the corresponding field values",
   "output_dimensions": {
-    "velocity": [3223, 1799],
-    "vorticity": [3223, 1791]
+    "velocity": [3223, 1800],
+    "vorticity": [3223, 1795]
   },
   "interpolation": "none beyond pcolormesh display of the audited rectilinear probe",
   "smoothing": null,
   "actual_ranges": {
-    "speed": [
+    "speed_star": [
       0.0,
       1.338166275
     ],
-    "vorticity": [
-      -6.727251053,
-      7.012727737
+    "vorticity_star": [
+      -13.454502106,
+      14.025455474
     ]
   },
   "fixed_ranges": {
-    "speed": [
+    "speed_star": [
       0.0,
       1.5
     ],
-    "vorticity": [
-      -1.0,
-      1.0
+    "vorticity_star": [
+      -2.0,
+      2.0
     ]
   },
   "preview": false

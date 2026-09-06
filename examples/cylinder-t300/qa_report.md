@@ -18,11 +18,13 @@
 5. Final PNGs were opened and checked at full output and reduced display size. Titles, body outline, scalar bars and axis notes are readable. The Q view hides the domain exterior and partition boundaries and does not mistake a two-dimensional slice for a three-dimensional gradient.
 6. The server paper-layout pass replaced canvas-edge annotations with real `x/D`, `y/D` axes, inward ticks, compact in-panel labels and colour bars separated from the axes by 0.015 of the figure width. Server previews and 3223-pixel final PNGs were both opened and checked.
 7. The earlier public CSV was correctly identified as a 41,014-point unstructured slice. It remains available under that name. Paper figures use a separate 321x181 rectilinear table made by retaining every second coordinate from the audited 641x361 probe, with no interpolation or smoothing during reduction.
+8. Schema v2 corrected the previous label-only vorticity normalization. The numerical values are now multiplied by `L_ref/U_ref=2 s` before plotting, the fixed comparison range is `[-2, 2]`, and the updated PNGs were opened at full and reduced size. The Cd horizontal axis is likewise converted to `t*=t U_ref/L_ref`.
 
 ## Scientific warnings
 
-- Velocity remains inside its fixed `[0, 1.5]` m/s scale. Spanwise vorticity reaches about `[-6.90, 7.21]` 1/s and therefore saturates the fixed `[-1, 1]` 1/s comparison scale.
+- Nondimensional velocity remains inside its fixed `[0, 1.5]` scale. Nondimensional spanwise vorticity reaches about `[-13.45, 14.03]` on the paper plane and therefore saturates the fixed `[-2, 2]` comparison scale.
 - Q* is `Q L_ref^2 / U_ref^2` with `L_ref=2 m`, `U_ref=1 m/s`; `Q*=0.2` is `Q=0.05 1/s^2`.
 - `centre_slice_unstructured_t300.csv` is the original unstructured slice. `centre_plane_paper_t300.csv` is the exact-stride rectilinear paper table. Q itself was computed from the full three-dimensional cell velocity gradient before point interpolation.
-- Cd restart segments are merged with explicit precedence at 290 s. Startup impulses at 0.01 and 0.02 s remain in the overview. The 240–300 s panel is raw and unsmoothed.
+- Cd restart segments are merged with explicit precedence at 290 s. Startup impulses at 0.01 and 0.02 s remain in the overview. The `t*=120–150` panel, corresponding to 240–300 s, is raw and unsmoothed.
+- The retained Q PNG was generated before schema v2 and colours the already nondimensional Q* surface by dimensional vorticity. The updated renderer now colours every new Q* image by `omega*=omega L_ref/U_ref`; rerendering this legacy Q image is deferred while the production sphere solver occupies the server.
 - The Cd effective sample size is about 28.9. No confidence interval is reported. No spectrum is claimed in this phase.

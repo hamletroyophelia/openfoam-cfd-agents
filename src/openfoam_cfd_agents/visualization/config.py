@@ -33,6 +33,8 @@ class PhysicsConfig(BaseModel):
     model_config = ConfigDict(extra='forbid', frozen=True, allow_inf_nan=False)
     reference_length: float = Field(gt=0)
     reference_velocity: float = Field(gt=0)
+    reference_length_symbol: str = Field(default='L_ref', pattern=r'^[A-Za-z][A-Za-z0-9_]*$')
+    reference_velocity_symbol: str = Field(default='U_ref', pattern=r'^[A-Za-z][A-Za-z0-9_]*$')
     streamwise: Vector3
     cross_stream: Vector3
     spanwise: Vector3
@@ -62,8 +64,8 @@ class RenderConfig(BaseModel):
     resolution: tuple[int, int]
     preview_resolution: tuple[int, int]
     data_resolution: tuple[int, int] = (640, 360)
-    velocity_range: tuple[float, float]
-    vorticity_range: tuple[float, float]
+    velocity_star_range: tuple[float, float]
+    vorticity_star_range: tuple[float, float]
     qstar_threshold: float = Field(gt=0)
     velocity_colormap: str = 'Viridis (matplotlib)'
     vorticity_colormap: str = 'Cool to Warm'
@@ -76,7 +78,7 @@ class RenderConfig(BaseModel):
 
     @model_validator(mode='after')
     def valid_ranges(self):
-        ranges = (self.velocity_range, self.vorticity_range,
+        ranges = (self.velocity_star_range, self.vorticity_star_range,
                   (self.roi[0], self.roi[1]), (self.roi[2], self.roi[3]), (self.roi[4], self.roi[5]))
         if any(low >= high for low, high in ranges):
             raise ValueError('render ranges must increase')
@@ -109,7 +111,7 @@ class ResourceConfig(BaseModel):
 
 class VisualizationConfig(BaseModel):
     model_config = ConfigDict(extra='forbid', frozen=True)
-    schema_version: Literal[1] = 1
+    schema_version: Literal[2] = 2
     case: CaseConfig
     physics: PhysicsConfig
     render: RenderConfig

@@ -1,5 +1,11 @@
 # Scientific visualization QA
 
+- Confirm `L_ref` and `U_ref` against case dictionaries or documented case setup.
+- Check that coordinates, time, velocity, vorticity, Q, frequency, and geometric depths are transformed numerically before plotting.
+- Check that fixed colour limits are expressed in the transformed quantity and shared across comparison cases.
+- Confirm dimensional raw columns remain available and the manifest records each formula and reference value.
+- Treat pressure and spectra as special cases: verify dimensions, reference pressure, density convention, and spectral Jacobian before conversion.
+
 - Confirm the selected time is complete and old enough in every partition.
 - Confirm the reader exposes all expected partitions and only one time value is selected.
 - Confirm all three mesh spans before computing a three-dimensional Q criterion.

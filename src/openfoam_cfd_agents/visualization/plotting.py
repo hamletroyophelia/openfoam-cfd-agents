@@ -19,6 +19,8 @@ def plot_cd_history(config: VisualizationConfig,
     data_dir.mkdir()
     figure_dir.mkdir()
     series = merge_force_segments(segments)
+    time_scale = config.physics.reference_velocity / config.physics.reference_length
+    time_star = series['time'] * time_scale
     start, stop = config.statistics.window
     selected = (series['time'] >= start) & (series['time'] <= stop)
     if np.count_nonzero(selected) < 4:
@@ -36,18 +38,19 @@ def plot_cd_history(config: VisualizationConfig,
             2, 1, figsize=(16, 9), constrained_layout=True,
             gridspec_kw={'height_ratios': [1, 2]}, sharex=False)
         label = config.case.display_name or config.case.id
-        overview.plot(series['time'], series['Cd'], color='#0F5B90', linewidth=1.0,
+        start_star, stop_star = start * time_scale, stop * time_scale
+        overview.plot(time_star, series['Cd'], color='#0F5B90', linewidth=1.0,
                       label=r'raw $C_d$ (all samples)')
-        overview.axvspan(start, stop, color='#22A6B3', alpha=0.14,
-                        label=f'statistics window [{start:g}, {stop:g}] s')
-        overview.set(xlabel='time [s]', ylabel=r'$C_d$',
+        overview.axvspan(start_star, stop_star, color='#22A6B3', alpha=0.14,
+                        label=fr'statistics window $t^*\in[{start_star:g}, {stop_star:g}]$')
+        overview.set(xlabel=r'$t^*=tU_{ref}/L_{ref}$', ylabel=r'$C_d$',
                      title=f'{label}: complete raw history, including startup impulses')
         overview.legend(loc='upper right')
-        window.plot(series['time'][selected], series['Cd'][selected], color='#0F5B90',
+        window.plot(time_star[selected], series['Cd'][selected], color='#0F5B90',
                     linewidth=1.15, label=r'raw $C_d$ in statistics window')
         window.axhline(statistics['mean'], color='#BF573A', linewidth=1.4, linestyle='--',
                        label=fr'time-weighted mean = {statistics["mean"]:.5f}')
-        window.set(xlabel='time [s]', ylabel=r'$C_d$',
+        window.set(xlabel=r'$t^*=tU_{ref}/L_{ref}$', ylabel=r'$C_d$',
                    title='Unsmoothed statistics window')
         window.legend(loc='best')
         for axis in (overview, window):
@@ -56,7 +59,14 @@ def plot_cd_history(config: VisualizationConfig,
             fig.savefig(figure_dir / f'cd_history.{suffix}', dpi=200 if suffix == 'png' else None)
         plt.close(fig)
     summary = {
-        'quantity': 'Cd', 'transform': 'none; raw samples retained',
+        'quantity': 'Cd', 'transform': 'Cd is already dimensionless; raw samples retained',
+        'horizontal_axis': {
+            'quantity': 't_star', 'formula': 't* = t U_ref / L_ref',
+            'reference_length': config.physics.reference_length,
+            'reference_velocity': config.physics.reference_velocity,
+            'statistics_window_dimensional': [start, stop],
+            'statistics_window_nondimensional': [start * time_scale, stop * time_scale],
+        },
         'merge_rules': [{'path': str(path.resolve()), 'start_inclusive': start_value,
                          'stop_exclusive': stop_value}
                         for path, start_value, stop_value in segments],

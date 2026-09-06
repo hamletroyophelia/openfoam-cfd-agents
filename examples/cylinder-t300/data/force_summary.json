@@ -1,6 +1,14 @@
 {
   "quantity": "Cd",
-  "transform": "none; raw samples retained",
+  "transform": "Cd is already dimensionless; raw samples retained",
+  "horizontal_axis": {
+    "quantity": "t_star",
+    "formula": "t* = t U_ref / L_ref",
+    "reference_length": 2.0,
+    "reference_velocity": 1.0,
+    "statistics_window_dimensional": [240.0, 300.0],
+    "statistics_window_nondimensional": [120.0, 150.0]
+  },
   "merge_rules": [
     {
       "path": "forceCoeffs-old.dat",

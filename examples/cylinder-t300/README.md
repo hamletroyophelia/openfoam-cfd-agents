@@ -4,7 +4,7 @@ This is the first reusable visualization sample for a completed Foundation OpenF
 
 Open [the static gallery](gallery/index.html), then read [manifest.json](manifest.json) and [qa_report.md](qa_report.md). The 41,014-point unstructured slice, the 321x181 exact-stride paper plane, and the merged force history are separate files in `data/`. The force figure is provided as PNG, SVG, and PDF. Preview and final field figures are separate.
 
-The main velocity and vorticity figures use paper-style `x/D`, `y/D` axes, compact in-panel labels and colour bars immediately beside the axes. They were rendered in the server's separate post-processing directory without reading the running case or smoothing the values.
+The main figures use paper-style `x/D`, `y/D` axes, compact in-panel labels and colour bars immediately beside the axes. Values are transformed before plotting: `|U|*=|U|/U_ref`, `omega_z*=omega_z D/U_ref`, and the force-history axis is `t*=t U_ref/D`. The dimensional source columns remain in `data/`. No field values are smoothed.
 
 Re-run the workflow with the repository skill at `.agents/skills/cfd-visualization/SKILL.md`. Prepare the JSON consumed by pvbatch with:
 

@@ -59,8 +59,9 @@ def add_title(pv, view, text, font_size):
     return source
 
 
-def add_axis_note(pv, view, font_size, z):
-    source = pv.Text(Text=f'x: streamwise    y: cross-stream    sampled plane z={z:g} m')
+def add_axis_note(pv, view, font_size, z, reference_length):
+    source = pv.Text(Text=(f'x/L_ref: streamwise    y/L_ref: cross-stream    '
+                           f'sampled plane z/L_ref={z / reference_length:g}'))
     display = pv.Show(source, view)
     display.WindowLocation = 'Lower Left Corner'
     display.FontFamily = 'Arial'
@@ -146,7 +147,8 @@ def scalar_slice(pv, source, config, array, component, value_range, title, bar_t
     scalar_bar(pv, display, view, lut, bar_title, render['_active_font_size'], value_range)
     pipeline = cylinder(pv, view, config['physics']['body'])
     pipeline += [add_title(pv, view, title, render['_active_font_size'] + 4),
-                 add_axis_note(pv, view, render['_active_font_size'], render['slice_origin'][2])]
+                 add_axis_note(pv, view, render['_active_font_size'], render['slice_origin'][2],
+                               config['physics']['reference_length'])]
     plane_camera(view, render['roi'])
     pv.Render(view)
     pv.SaveScreenshot(str(output), view, ImageResolution=render['_active_resolution'], CompressionLevel='5')
@@ -170,12 +172,12 @@ def clip_to_roi(pv, source, roi):
     return result, filters
 
 
-def render_q(pv, points, config, q_threshold, output):
+def render_q(pv, points, config, output):
     render = config['render']
     cropped, clips = clip_to_roi(pv, points, render['roi'])
     surface = pv.Contour(Input=cropped)
-    surface.ContourBy = ['POINTS', 'Q']
-    surface.Isosurfaces = [q_threshold]
+    surface.ContourBy = ['POINTS', 'Qstar']
+    surface.Isosurfaces = [render['qstar_threshold']]
     surface.UpdatePipeline(float(config['case']['selected_time']))
     if surface.GetDataInformation().GetNumberOfCells() == 0:
         raise ValueError('selected Q* threshold produces an empty surface')
@@ -185,20 +187,22 @@ def render_q(pv, points, config, q_threshold, output):
     display.Ambient = 0.42
     display.Diffuse = 0.58
     display.Specular = 0.0
-    pv.ColorBy(display, ('POINTS', 'Vorticity', 'Z'))
-    lut = pv.GetColorTransferFunction('Vorticity')
-    low, high = render['vorticity_range']
+    pv.ColorBy(display, ('POINTS', 'VorticityStar', 'Z'))
+    lut = pv.GetColorTransferFunction('VorticityStar')
+    low, high = render['vorticity_star_range']
     limit = max(abs(low), abs(high))
     lut.RGBPoints = [-limit, 0.230, 0.299, 0.754, 0, 0.94, 0.94, 0.94,
                      limit, 0.706, 0.016, 0.150]
     lut.ColorSpace = 'Lab'
     lut.RescaleTransferFunction(low, high)
-    scalar_bar(pv, display, view, lut, 'spanwise vorticity omega_z [1/s]',
+    scalar_bar(pv, display, view, lut, 'omega_z* = omega_z L_ref/U_ref',
                render['_active_font_size'], (low, high), horizontal=True)
     pipeline = cylinder(pv, view, config['physics']['body'])
+    time_star = (float(config['case']['selected_time']) * config['physics']['reference_velocity']
+                 / config['physics']['reference_length'])
     pipeline += [add_title(pv, view,
         f"{config['case'].get('display_name') or config['case']['id']}\n"
-        f"t={float(config['case']['selected_time']):g} s | Q*={render['qstar_threshold']:g}",
+        f"t*={time_star:g} | Q*={render['qstar_threshold']:g}",
         render['_active_font_size'] + 4)]
     view.CameraPosition = render['q_camera_position']
     view.CameraFocalPoint = render['q_camera_focal_point']
@@ -255,7 +259,16 @@ def main():
     point_fields.AttributeType = 'Point Data'
     point_fields.ResultArrayName = 'Umag'
     point_fields.Function = 'mag(U)'
-    point_qstar = pv.Calculator(Input=point_fields)
+    velocity_star = pv.Calculator(Input=point_fields)
+    velocity_star.AttributeType = 'Point Data'
+    velocity_star.ResultArrayName = 'UmagStar'
+    velocity_star.Function = f"Umag/{config['physics']['reference_velocity']:.17g}"
+    vorticity_star = pv.Calculator(Input=velocity_star)
+    vorticity_star.AttributeType = 'Point Data'
+    vorticity_star.ResultArrayName = 'VorticityStar'
+    vorticity_star.Function = (
+        f"Vorticity*{config['physics']['reference_length'] / config['physics']['reference_velocity']:.17g}")
+    point_qstar = pv.Calculator(Input=vorticity_star)
     point_qstar.AttributeType = 'Point Data'
     point_qstar.ResultArrayName = 'Qstar'
     scale = config['physics']['reference_length'] ** 2 / config['physics']['reference_velocity'] ** 2
@@ -271,7 +284,8 @@ def main():
     data_plane = sampling_plane(pv, config['render']['roi'], z, config['render']['data_resolution'])
     data_sample = pv.ResampleWithDataset(SourceDataArrays=point_qstar, DestinationMesh=data_plane)
     selected_data = pv.PassArrays(Input=data_sample)
-    selected_data.PointDataArrays = ['U', 'Umag', 'Vorticity', 'Q', 'Qstar', 'vtkValidPointMask']
+    selected_data.PointDataArrays = ['U', 'Umag', 'UmagStar', 'Vorticity', 'VorticityStar',
+                                     'Q', 'Qstar', 'vtkValidPointMask']
     selected_data.UpdatePipeline(selected)
 
     resolution_token = 'preview' if args.preview else 'final'
@@ -279,17 +293,17 @@ def main():
     vorticity_file = figures / f'vorticity_spanwise_t{selected:g}_{resolution_token}.png'
     q_file = figures / f'qcriterion_qstar{config["render"]["qstar_threshold"]:g}_t{selected:g}_{resolution_token}.png'
     velocity_view, velocity_pipeline = scalar_slice(
-        pv, sampled_slice, config, 'Umag', None, config['render']['velocity_range'],
+        pv, sampled_slice, config, 'UmagStar', None, config['render']['velocity_star_range'],
         f"{config['case'].get('display_name') or config['case']['id']}\n"
-        f"Velocity magnitude | t={selected:g} s | z={z:g} m",
-        '|U| [m/s]', velocity_file)
+        f"Velocity magnitude | t*={selected * config['physics']['reference_velocity'] / config['physics']['reference_length']:g}",
+        '|U|* = |U|/U_ref', velocity_file)
     vorticity_view, vorticity_pipeline = scalar_slice(
-        pv, sampled_slice, config, 'Vorticity', 'Z', config['render']['vorticity_range'],
+        pv, sampled_slice, config, 'VorticityStar', 'Z', config['render']['vorticity_star_range'],
         f"{config['case'].get('display_name') or config['case']['id']}\n"
-        f"Spanwise vorticity | t={selected:g} s | z={z:g} m",
-        'omega_z [1/s]', vorticity_file)
+        f"Spanwise vorticity | t*={selected * config['physics']['reference_velocity'] / config['physics']['reference_length']:g}",
+        'omega_z* = omega_z L_ref/U_ref', vorticity_file)
     q_threshold = config['render']['qstar_threshold'] / scale
-    q_surface, q_view, clips, q_pipeline = render_q(pv, points, config, q_threshold, q_file)
+    q_surface, q_view, clips, q_pipeline = render_q(pv, point_qstar, config, q_file)
 
     pv.SaveData(str(data / f'centre_slice_t{selected:g}.csv'), proxy=selected_data, Precision=10)
     state = states / f'{config["case"]["id"]}_t{selected:g}.pvsm'
@@ -297,16 +311,26 @@ def main():
     window = q_view.GetClientSideObject().GetRenderWindow()
     capabilities = window.ReportCapabilities().splitlines()
     summary = {
-        'selected_time': selected, 'available_times': available_times,
+        'selected_time': selected,
+        'selected_time_star': selected * config['physics']['reference_velocity'] / config['physics']['reference_length'],
+        'available_times': available_times,
         'mesh_bounds': input_bounds, 'mesh_dimension': 3,
         'reader_cells': input_info.GetNumberOfCells(),
         'slice_cells': sampled_slice.GetDataInformation().GetNumberOfCells(),
         'q_surface_cells': q_surface.GetDataInformation().GetNumberOfCells(),
-        'ranges': {'Umag_actual': data_range(sampled_slice, 'POINTS', 'Umag'),
-                   'Vorticity_z_actual': data_range(sampled_slice, 'POINTS', 'Vorticity', 2),
-                   'Q_actual': data_range(gradient, 'CELLS', 'Q')},
-        'fixed_ranges': {'Umag': config['render']['velocity_range'],
-                         'Vorticity_z': config['render']['vorticity_range']},
+        'nondimensionalization': {
+            'coordinates': 'x* = x/L_ref', 'time': 't* = t U_ref/L_ref',
+            'velocity': 'U* = U/U_ref', 'vorticity': 'omega* = omega L_ref/U_ref',
+            'q': 'Q* = Q L_ref^2/U_ref^2',
+            'reference_length': config['physics']['reference_length'],
+            'reference_velocity': config['physics']['reference_velocity'],
+        },
+        'ranges': {'UmagStar_actual': data_range(sampled_slice, 'POINTS', 'UmagStar'),
+                   'VorticityStar_z_actual': data_range(sampled_slice, 'POINTS', 'VorticityStar', 2),
+                   'Q_actual': data_range(gradient, 'CELLS', 'Q'),
+                   'Qstar_actual': [value * scale for value in data_range(gradient, 'CELLS', 'Q')]},
+        'fixed_ranges': {'UmagStar': config['render']['velocity_star_range'],
+                         'VorticityStar_z': config['render']['vorticity_star_range']},
         'range_exceeded': {}, 'qstar_threshold': config['render']['qstar_threshold'],
         'q_dimensional_threshold': q_threshold,
         'pipeline': {'partition_handling': 'MergeBlocks with coincident-point merging before gradients',
@@ -326,7 +350,7 @@ def main():
         'elapsed_seconds': time.monotonic() - started,
     }
     for key, fixed in summary['fixed_ranges'].items():
-        actual = summary['ranges']['Umag_actual' if key == 'Umag' else 'Vorticity_z_actual']
+        actual = summary['ranges']['UmagStar_actual' if key == 'UmagStar' else 'VorticityStar_z_actual']
         summary['range_exceeded'][key] = actual[0] < fixed[0] or actual[1] > fixed[1]
     (data / 'render_summary.json').write_text(json.dumps(summary, indent=2) + '\n', encoding='utf-8')
     print(json.dumps(summary))

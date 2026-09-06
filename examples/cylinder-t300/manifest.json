@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "title": "Cylinder Re=100: first-stage scientific visualization",
-  "release": "0.4.1",
+  "release": "0.5.0",
   "created_at": "2026-09-06T18:05:37+08:00",
   "source": {
     "case_id": "cylinder_Re100_LES_WALE_Lz4D_v14force_20260902",
@@ -39,7 +39,14 @@
     "body_span_m": 8.0,
     "submergence": null,
     "reference_velocity_m_per_s": 1.0,
-    "reference_length_m": 2.0
+    "reference_length_m": 2.0,
+    "nondimensionalization": {
+      "coordinates": "x*=x/L_ref",
+      "time": "t*=t U_ref/L_ref",
+      "velocity": "U*=U/U_ref",
+      "vorticity": "omega*=omega L_ref/U_ref",
+      "q": "Q*=Q L_ref^2/U_ref^2"
+    }
   },
   "software": {
     "paraview": "5.12.1 for extraction and Q; 5.13.3 bundled Python for server paper layout",
@@ -54,11 +61,11 @@
   "render": {
     "resolution": [
       3223,
-      1799
+      1800
     ],
     "vorticity_resolution": [
       3223,
-      1791
+      1795
     ],
     "preview_resolution": [
       1280,
@@ -83,13 +90,13 @@
       4.0
     ],
     "slice": "z=0 m",
-    "velocity_range_m_per_s": [
+    "velocity_star_range": [
       0.0,
       1.5
     ],
-    "vorticity_range_per_s": [
-      -1.0,
-      1.0
+    "vorticity_star_range": [
+      -2.0,
+      2.0
     ],
     "qstar_threshold": 0.2,
     "q_dimensional_threshold_per_s2": 0.05,
@@ -111,6 +118,10 @@
       240.0,
       300.0
     ],
+    "window_t_star": [
+      120.0,
+      150.0
+    ],
     "raw_samples": 30001,
     "window_samples": 6001,
     "merge": "old segment t<290; recovery segment t>=290; conflicting duplicates fail",
@@ -123,7 +134,8 @@
     "spectrum": "not produced in this first-stage bundle"
   },
   "warnings": [
-    "The fixed vorticity scale saturates values outside [-1, 1] 1/s; actual sampled extrema are approximately [-6.90, 7.21] 1/s.",
+    "The fixed nondimensional vorticity scale saturates values outside [-2, 2]; the paper-plane extrema are approximately [-13.45, 14.03].",
+    "The retained Q image predates schema v2 and colours Q* surfaces by dimensional vorticity; new renders colour them by omega*=omega L_ref/U_ref.",
     "Visible angular transitions near the cylinder follow mesh-resolution transitions and persist across independent sampling checks; the paper layout uses an exact stride reduction and no smoothing.",
     "Startup Cd impulses at t=0.01 and 0.02 s are retained in the overview and excluded only by the declared statistics window.",
     "The portable pvsm stores cylinder.foam as a relative placeholder and requires relinking to the derived case view when opened."
@@ -133,11 +145,11 @@
     "final_png_dimensions": {
       "figures/velocity_magnitude_t300.png": [
         3223,
-        1799
+        1800
       ],
       "figures/vorticity_spanwise_t300.png": [
         3223,
-        1791
+        1795
       ],
       "figures/qcriterion_qstar0.2_t300.png": [
         3200,
@@ -149,14 +161,14 @@
     {
       "path": "figures/velocity_magnitude_t300.png",
       "name": "Velocity magnitude",
-      "alt": "Centre-plane velocity magnitude around a circular cylinder",
-      "caption": "Paper layout with x/D and y/D axes, inset panel label and adjacent fixed 0 to 1.5 scale."
+      "alt": "Centre-plane nondimensional velocity magnitude around a circular cylinder",
+      "caption": "Paper layout with x/D and y/D axes and adjacent fixed |U|/U_ref scale."
     },
     {
       "path": "figures/vorticity_spanwise_t300.png",
       "name": "Spanwise vorticity",
-      "alt": "Centre-plane signed spanwise vorticity wake",
-      "caption": "Paper layout with adjacent zero-centred scale; pointed ends disclose saturation."
+      "alt": "Centre-plane signed nondimensional spanwise vorticity wake",
+      "caption": "Values use omega_z D/U_ref with an adjacent zero-centred fixed scale; pointed ends disclose saturation."
     },
     {
       "path": "figures/qcriterion_qstar0.2_t300.png",
@@ -167,15 +179,15 @@
     {
       "path": "figures/cd_history.png",
       "name": "Raw drag history",
-      "alt": "Raw drag coefficient history and unsmoothed statistics window",
-      "caption": "All startup impulses retained; the lower panel shows the explicit 240 to 300 second statistics window."
+      "alt": "Raw drag coefficient history against nondimensional time and unsmoothed statistics window",
+      "caption": "All startup impulses retained; the lower panel shows the explicit t*=120 to 150 statistics window."
     }
   ],
   "artifacts": [
     {
       "path": "viz.yaml",
-      "bytes": 1141,
-      "sha256": "254e6867aaeebfdcf3b24356120b92e6d264836865624c69194dc110fa0b8655"
+      "bytes": 1215,
+      "sha256": "21577e99aa0c1f09a9faedca569ce8112d5c2431dab20536607fcc7e95f461b0"
     },
     {
       "path": "cfd-publication.mplstyle",
@@ -194,8 +206,8 @@
     },
     {
       "path": "data/force_summary.json",
-      "bytes": 1454,
-      "sha256": "376405fae7baa90d254c389ef098672815ab010d52e001d3ddb171adde654e2e"
+      "bytes": 1737,
+      "sha256": "94107f29bf2707cf72c358ad6ef99bb5a7b5dd5363d2ba50b651d1391741f500"
     },
     {
       "path": "data/centre_slice_unstructured_t300.csv",
@@ -209,8 +221,8 @@
     },
     {
       "path": "data/paper_layout_summary.json",
-      "bytes": 850,
-      "sha256": "67e82659ef192f279b76ea2da85d7f31a8cbb38844f9cb9a346811b940b7aca5"
+      "bytes": 1065,
+      "sha256": "f205beb09a3370ee0528828d49e8981f29b2bfd06fa522ccb577fc9a9ce13ff9"
     },
     {
       "path": "data/force_coefficients.csv",
@@ -219,13 +231,13 @@
     },
     {
       "path": "figures/velocity_magnitude_t300.png",
-      "bytes": 162660,
-      "sha256": "06b50e7d21dca75a4ce2708b3efbcf91628c29f21a1a2d335236b66de6f6fd9f"
+      "bytes": 156178,
+      "sha256": "52d78fe9646169d059bb9d4ad1ee38ac2e90e29930f17c1b944107912dc7b52a"
     },
     {
       "path": "figures/vorticity_spanwise_t300.png",
-      "bytes": 160186,
-      "sha256": "6f7442d3f96acd9672ac8d213a4c55fa280f7b5c036ffc1888276a1d35e2bf93"
+      "bytes": 145762,
+      "sha256": "4be16007cb46c1db9f86ea36edbd78d2c962f2955a9c8105f48690b0e746bf44"
     },
     {
       "path": "figures/qcriterion_qstar0.2_t300.png",
@@ -234,18 +246,18 @@
     },
     {
       "path": "figures/cd_history.png",
-      "bytes": 315832,
-      "sha256": "46a0dd81425db03bcf670ac65ec9750d7df4b3abba1186bac87d47f1771a41d0"
+      "bytes": 321934,
+      "sha256": "06a014119046dbd6e85163ea07cd60631c47e1a1de2740afec6c9a1a7d15c6c4"
     },
     {
       "path": "figures/cd_history.svg",
-      "bytes": 78751,
-      "sha256": "d60f56a70e1658a064a1228217857eba6753bbd3a99f5e912664ca7350689127"
+      "bytes": 87838,
+      "sha256": "7c1c73289dc5630ad9be2d7d8f5d385bc0821d26d7cc7278115cdd776d281364"
     },
     {
       "path": "figures/cd_history.pdf",
-      "bytes": 66272,
-      "sha256": "3e8e33af5e07a507b06f459b315c6195c55efff7cdc34ff7286503b9fdf1040f"
+      "bytes": 76362,
+      "sha256": "f55651ee3b820ad63eb3b38af1f4747d517c7c124ca192474a73d224da880db6"
     },
     {
       "path": "previews/velocity_magnitude_t300.png",
@@ -269,8 +281,8 @@
     },
     {
       "path": "qa_report.md",
-      "bytes": 3252,
-      "sha256": "36568e9bf48b45fafe1b789fee6ab6384991e6f93cc1df200de87d352abb1a25"
+      "bytes": 3954,
+      "sha256": "2131a76435bee8a706f437d5c44e0c1433aefadb33e4347efe1c5fcc0ead1023"
     },
     {
       "path": "server_delivery.md",
@@ -279,8 +291,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 1857,
-      "sha256": "f3699b99439f1cb34fb5240ee60c81e9304aa1ee4eb5ce303aa3b0e5d0d211f6"
+      "bytes": 1918,
+      "sha256": "bc15e0422356e966d3cafb82dba92814a7411a887045202c99ecc1c7c90db305"
     }
   ]
 }

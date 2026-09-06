@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.0 — 2026-09-06
+
+- Make numerical nondimensionalization mandatory for every plotted quantity with defensible reference scales.
+- Add explicit schema-v2 reference symbols and fixed ranges for velocity and vorticity stars.
+- Plot force-history time as `t*=t U_ref/L_ref`, while retaining dimensional raw samples and statistics provenance.
+- Correct the cylinder paper sample so spanwise vorticity values are multiplied by `L_ref/U_ref` before rendering.
+
 ## 0.4.1 — 2026-09-06
 
 - Add journal-style 2D field plots with `x/D`, `y/D` axes, in-panel labels and adjacent fixed-range colour bars.
