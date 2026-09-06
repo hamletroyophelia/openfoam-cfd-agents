@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "title": "Cylinder Re=100: first-stage scientific visualization",
-  "release": "0.4.0",
-  "created_at": "2026-09-06T16:03:45+08:00",
+  "release": "0.4.1",
+  "created_at": "2026-09-06T18:05:37+08:00",
   "source": {
     "case_id": "cylinder_Re100_LES_WALE_Lz4D_v14force_20260902",
     "source_policy": "read-only; audited time and mesh copied to a separate local derived case view",
@@ -31,19 +31,23 @@
     "reference_length_m": 2.0
   },
   "software": {
-    "paraview": "5.12.1",
+    "paraview": "5.12.1 for extraction and Q; 5.13.3 bundled Python for server paper layout",
     "vtk": "9.3.20231030",
     "renderer": "Intel Iris Xe Graphics, OpenGL 4.5, offscreen=true",
     "osmesa": "not used; the offscreen OpenGL smoke test passed",
-    "python_analysis": "isolated project .venv",
-    "numpy": "2.5.2",
+    "python_analysis": "isolated project .venv for statistics; ParaView bundled Python for lightweight server layout",
+    "numpy": "2.5.2 locally; 1.26.4 for server layout",
     "scipy": "1.18.1",
-    "matplotlib": "3.11.1"
+    "matplotlib": "3.11.1 locally; 3.7.2 for server layout"
   },
   "render": {
-    "resolution": [3200, 1800],
+    "resolution": [3223, 1799],
+    "vorticity_resolution": [3223, 1791],
     "preview_resolution": [1280, 720],
-    "extract_resolution": [640, 360],
+    "field_figure_probe_resolution": [1600, 900],
+    "published_unstructured_slice_points": 41014,
+    "paper_plane_resolution": [321, 181],
+    "paper_plane_reduction": "every second coordinate from the audited 641x361 probe; values retained without smoothing",
     "roi_m": [-6.0, 18.0, -6.75, 6.75, -4.0, 4.0],
     "slice": "z=0 m",
     "velocity_range_m_per_s": [0.0, 1.5],
@@ -72,27 +76,32 @@
   },
   "warnings": [
     "The fixed vorticity scale saturates values outside [-1, 1] 1/s; actual sampled extrema are approximately [-6.90, 7.21] 1/s.",
-    "Visible angular transitions near the cylinder follow mesh-resolution transitions and persist across independent sampling checks; no smoothing was applied.",
+    "Visible angular transitions near the cylinder follow mesh-resolution transitions and persist across independent sampling checks; the paper layout uses an exact stride reduction and no smoothing.",
     "Startup Cd impulses at t=0.01 and 0.02 s are retained in the overview and excluded only by the declared statistics window.",
     "The portable pvsm stores cylinder.foam as a relative placeholder and requires relinking to the derived case view when opened."
   ],
   "acceptance": {
     "visual_review": "passed after opening the final PNGs at full and reduced size",
-    "final_pngs": ["figures/velocity_magnitude_t300.png", "figures/vorticity_spanwise_t300.png", "figures/qcriterion_qstar0.2_t300.png"]
+    "final_png_dimensions": {
+      "figures/velocity_magnitude_t300.png": [3223, 1799],
+      "figures/vorticity_spanwise_t300.png": [3223, 1791],
+      "figures/qcriterion_qstar0.2_t300.png": [3200, 1800]
+    }
   },
   "gallery": [
-    {"path": "figures/velocity_magnitude_t300.png", "name": "Velocity magnitude", "alt": "Centre-plane velocity magnitude around a circular cylinder", "caption": "Orthographic z=0 slice; fixed 0 to 1.5 m/s sequential scale."},
-    {"path": "figures/vorticity_spanwise_t300.png", "name": "Spanwise vorticity", "alt": "Centre-plane signed spanwise vorticity wake", "caption": "Zero-centred diverging scale; saturation is disclosed in the manifest."},
+    {"path": "figures/velocity_magnitude_t300.png", "name": "Velocity magnitude", "alt": "Centre-plane velocity magnitude around a circular cylinder", "caption": "Paper layout with x/D and y/D axes, inset panel label and adjacent fixed 0 to 1.5 scale."},
+    {"path": "figures/vorticity_spanwise_t300.png", "name": "Spanwise vorticity", "alt": "Centre-plane signed spanwise vorticity wake", "caption": "Paper layout with adjacent zero-centred scale; pointed ends disclose saturation."},
     {"path": "figures/qcriterion_qstar0.2_t300.png", "name": "Three-dimensional Q*", "alt": "Three-dimensional Q-star isosurfaces coloured by spanwise vorticity", "caption": "Q* = 0.2 from the full three-dimensional velocity gradient; domain shell and partition boundaries hidden."},
     {"path": "figures/cd_history.png", "name": "Raw drag history", "alt": "Raw drag coefficient history and unsmoothed statistics window", "caption": "All startup impulses retained; the lower panel shows the explicit 240 to 300 second statistics window."}
   ],
   "artifact_paths": [
     "viz.yaml", "cfd-publication.mplstyle", "data/case-audit.json", "data/render_summary.json",
-    "data/force_summary.json", "data/centre_slice_t300.csv", "data/force_coefficients.csv",
+    "data/force_summary.json", "data/centre_slice_unstructured_t300.csv",
+    "data/centre_plane_paper_t300.csv", "data/paper_layout_summary.json", "data/force_coefficients.csv",
     "figures/velocity_magnitude_t300.png", "figures/vorticity_spanwise_t300.png",
     "figures/qcriterion_qstar0.2_t300.png", "figures/cd_history.png", "figures/cd_history.svg",
     "figures/cd_history.pdf", "previews/velocity_magnitude_t300.png",
     "previews/vorticity_spanwise_t300.png", "previews/qcriterion_qstar0.2_t300.png",
-    "states/cylinder_t300.pvsm", "qa_report.md", "README.md"
+    "states/cylinder_t300.pvsm", "qa_report.md", "server_delivery.md", "README.md"
   ]
 }

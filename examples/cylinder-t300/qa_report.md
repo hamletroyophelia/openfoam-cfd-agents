@@ -16,11 +16,13 @@
 3. Early 3200px output allowed ParaView to generate too many tick labels. Supported custom labels and square-root font scaling corrected the overlap.
 4. Velocity and vorticity images show angular transitions near mesh-resolution changes. They persisted after merging coincident partition points, sampling at z=0 and z=0.05 m, and comparing point and cell probes. They are not missing-partition seams. No smoothing was used to conceal them.
 5. Final PNGs were opened and checked at full output and reduced display size. Titles, body outline, scalar bars and axis notes are readable. The Q view hides the domain exterior and partition boundaries and does not mistake a two-dimensional slice for a three-dimensional gradient.
+6. The server paper-layout pass replaced canvas-edge annotations with real `x/D`, `y/D` axes, inward ticks, compact in-panel labels and colour bars separated from the axes by 0.015 of the figure width. Server previews and 3223-pixel final PNGs were both opened and checked.
+7. The earlier public CSV was correctly identified as a 41,014-point unstructured slice. It remains available under that name. Paper figures use a separate 321x181 rectilinear table made by retaining every second coordinate from the audited 641x361 probe, with no interpolation or smoothing during reduction.
 
 ## Scientific warnings
 
 - Velocity remains inside its fixed `[0, 1.5]` m/s scale. Spanwise vorticity reaches about `[-6.90, 7.21]` 1/s and therefore saturates the fixed `[-1, 1]` 1/s comparison scale.
 - Q* is `Q L_ref^2 / U_ref^2` with `L_ref=2 m`, `U_ref=1 m/s`; `Q*=0.2` is `Q=0.05 1/s^2`.
-- Centre-plane tables are uniform probes of point-interpolated fields. Q itself was computed from the full three-dimensional cell velocity gradient before that interpolation.
+- `centre_slice_unstructured_t300.csv` is the original unstructured slice. `centre_plane_paper_t300.csv` is the exact-stride rectilinear paper table. Q itself was computed from the full three-dimensional cell velocity gradient before point interpolation.
 - Cd restart segments are merged with explicit precedence at 290 s. Startup impulses at 0.01 and 0.02 s remain in the overview. The 240–300 s panel is raw and unsmoothed.
 - The Cd effective sample size is about 28.9. No confidence interval is reported. No spectrum is claimed in this phase.

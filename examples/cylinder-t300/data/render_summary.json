@@ -81,7 +81,8 @@
     "figures/velocity_magnitude_t300.png",
     "figures/vorticity_spanwise_t300.png",
     "figures/qcriterion_qstar0.2_t300.png",
-    "data/centre_slice_t300.csv",
+    "data/centre_slice_unstructured_t300.csv",
+    "data/centre_plane_paper_t300.csv",
     "states/cylinder_t300.pvsm"
   ],
   "renderer": {
@@ -93,8 +94,7 @@
     ]
   },
   "elapsed_seconds": 90.96900000000096,
-  "data_resolution": [
-    640,
-    360
-  ]
+  "field_figure_probe_resolution": [1600, 900],
+  "published_unstructured_slice_points": 41014,
+  "paper_plane_resolution": [321, 181]
 }

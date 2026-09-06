@@ -27,6 +27,8 @@ Merge force segments with explicit half-open intervals. Fail on time regressions
 
 Apply [cfd-publication.mplstyle](assets/cfd-publication.mplstyle) to Matplotlib outputs. Save curve figures as PNG, SVG, and PDF. Keep previews separate from final 3200-pixel field figures.
 
+Use [paper_fields.py](scripts/paper_fields.py) when a reviewed plane CSV needs journal-style `x/D`, `y/D` axes, compact in-panel labels, and a colour bar immediately beside the axes. This step must retain the configured fixed ranges and must not smooth the extracted field.
+
 ## Inspect and publish
 
 Open every PNG and inspect composition, type, scalar bars, occlusion, aliasing, saturation, body outline, partition artifacts, and physical labels. Modify the pipeline and render again when a defect is visible. Record failed iterations and the correction in `qa_report.md`; never infer visual acceptance from exit status.

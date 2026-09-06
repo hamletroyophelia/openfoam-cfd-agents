@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "title": "Cylinder Re=100: first-stage scientific visualization",
-  "release": "0.4.0",
-  "created_at": "2026-09-06T16:03:45+08:00",
+  "release": "0.4.1",
+  "created_at": "2026-09-06T18:05:37+08:00",
   "source": {
     "case_id": "cylinder_Re100_LES_WALE_Lz4D_v14force_20260902",
     "source_policy": "read-only; audited time and mesh copied to a separate local derived case view",
@@ -42,28 +42,38 @@
     "reference_length_m": 2.0
   },
   "software": {
-    "paraview": "5.12.1",
+    "paraview": "5.12.1 for extraction and Q; 5.13.3 bundled Python for server paper layout",
     "vtk": "9.3.20231030",
     "renderer": "Intel Iris Xe Graphics, OpenGL 4.5, offscreen=true",
     "osmesa": "not used; the offscreen OpenGL smoke test passed",
-    "python_analysis": "isolated project .venv",
-    "numpy": "2.5.2",
+    "python_analysis": "isolated project .venv for statistics; ParaView bundled Python for lightweight server layout",
+    "numpy": "2.5.2 locally; 1.26.4 for server layout",
     "scipy": "1.18.1",
-    "matplotlib": "3.11.1"
+    "matplotlib": "3.11.1 locally; 3.7.2 for server layout"
   },
   "render": {
     "resolution": [
-      3200,
-      1800
+      3223,
+      1799
+    ],
+    "vorticity_resolution": [
+      3223,
+      1791
     ],
     "preview_resolution": [
       1280,
       720
     ],
-    "extract_resolution": [
-      640,
-      360
+    "field_figure_probe_resolution": [
+      1600,
+      900
     ],
+    "published_unstructured_slice_points": 41014,
+    "paper_plane_resolution": [
+      321,
+      181
+    ],
+    "paper_plane_reduction": "every second coordinate from the audited 641x361 probe; values retained without smoothing",
     "roi_m": [
       -6.0,
       18.0,
@@ -114,30 +124,39 @@
   },
   "warnings": [
     "The fixed vorticity scale saturates values outside [-1, 1] 1/s; actual sampled extrema are approximately [-6.90, 7.21] 1/s.",
-    "Visible angular transitions near the cylinder follow mesh-resolution transitions and persist across independent sampling checks; no smoothing was applied.",
+    "Visible angular transitions near the cylinder follow mesh-resolution transitions and persist across independent sampling checks; the paper layout uses an exact stride reduction and no smoothing.",
     "Startup Cd impulses at t=0.01 and 0.02 s are retained in the overview and excluded only by the declared statistics window.",
     "The portable pvsm stores cylinder.foam as a relative placeholder and requires relinking to the derived case view when opened."
   ],
   "acceptance": {
     "visual_review": "passed after opening the final PNGs at full and reduced size",
-    "final_pngs": [
-      "figures/velocity_magnitude_t300.png",
-      "figures/vorticity_spanwise_t300.png",
-      "figures/qcriterion_qstar0.2_t300.png"
-    ]
+    "final_png_dimensions": {
+      "figures/velocity_magnitude_t300.png": [
+        3223,
+        1799
+      ],
+      "figures/vorticity_spanwise_t300.png": [
+        3223,
+        1791
+      ],
+      "figures/qcriterion_qstar0.2_t300.png": [
+        3200,
+        1800
+      ]
+    }
   },
   "gallery": [
     {
       "path": "figures/velocity_magnitude_t300.png",
       "name": "Velocity magnitude",
       "alt": "Centre-plane velocity magnitude around a circular cylinder",
-      "caption": "Orthographic z=0 slice; fixed 0 to 1.5 m/s sequential scale."
+      "caption": "Paper layout with x/D and y/D axes, inset panel label and adjacent fixed 0 to 1.5 scale."
     },
     {
       "path": "figures/vorticity_spanwise_t300.png",
       "name": "Spanwise vorticity",
       "alt": "Centre-plane signed spanwise vorticity wake",
-      "caption": "Zero-centred diverging scale; saturation is disclosed in the manifest."
+      "caption": "Paper layout with adjacent zero-centred scale; pointed ends disclose saturation."
     },
     {
       "path": "figures/qcriterion_qstar0.2_t300.png",
@@ -170,8 +189,8 @@
     },
     {
       "path": "data/render_summary.json",
-      "bytes": 2124,
-      "sha256": "d0155dbd3ba1f762e82650badf13995300563a1370552f24b03921c570d42e74"
+      "bytes": 2262,
+      "sha256": "baa746c1aeeb0232c7831c186b46a803cb27af4746f904a821e6d45416512366"
     },
     {
       "path": "data/force_summary.json",
@@ -179,9 +198,19 @@
       "sha256": "376405fae7baa90d254c389ef098672815ab010d52e001d3ddb171adde654e2e"
     },
     {
-      "path": "data/centre_slice_t300.csv",
+      "path": "data/centre_slice_unstructured_t300.csv",
       "bytes": 6691269,
       "sha256": "1872db5c6c31d065be91385e49e8482f4faebb068f5af7f90193244098719dca"
+    },
+    {
+      "path": "data/centre_plane_paper_t300.csv",
+      "bytes": 2935545,
+      "sha256": "1426b07ebe9a685f3e1a960043318f3589aabe12696a53bc176c172524a39693"
+    },
+    {
+      "path": "data/paper_layout_summary.json",
+      "bytes": 850,
+      "sha256": "67e82659ef192f279b76ea2da85d7f31a8cbb38844f9cb9a346811b940b7aca5"
     },
     {
       "path": "data/force_coefficients.csv",
@@ -190,13 +219,13 @@
     },
     {
       "path": "figures/velocity_magnitude_t300.png",
-      "bytes": 709523,
-      "sha256": "7f14c1a10882b51a9bc77c93dafd7664a387a01006c563f0b833bb4778c7e397"
+      "bytes": 162660,
+      "sha256": "06b50e7d21dca75a4ce2708b3efbcf91628c29f21a1a2d335236b66de6f6fd9f"
     },
     {
       "path": "figures/vorticity_spanwise_t300.png",
-      "bytes": 608579,
-      "sha256": "97a59f3d3855c1fda689b99525d647b62783c99fd87148ceb132b3a0cea020f8"
+      "bytes": 160186,
+      "sha256": "6f7442d3f96acd9672ac8d213a4c55fa280f7b5c036ffc1888276a1d35e2bf93"
     },
     {
       "path": "figures/qcriterion_qstar0.2_t300.png",
@@ -220,13 +249,13 @@
     },
     {
       "path": "previews/velocity_magnitude_t300.png",
-      "bytes": 232590,
-      "sha256": "4830fb42b170ecae722a6b632bcc9328ddad0c12c7cb8662665f4adca1650803"
+      "bytes": 82020,
+      "sha256": "cdeecadeeec86943d4fb444862e5416c00144c4419905b317bbf1810112dcf67"
     },
     {
       "path": "previews/vorticity_spanwise_t300.png",
-      "bytes": 192947,
-      "sha256": "5c744421862b3498606be222d15e29b698bbf9cc656d5fab9e0055d74626c707"
+      "bytes": 72570,
+      "sha256": "26386d8c979b4291215ca667ed28dfca70bf5aef3d80f9b9e0640e674c113840"
     },
     {
       "path": "previews/qcriterion_qstar0.2_t300.png",
@@ -240,13 +269,18 @@
     },
     {
       "path": "qa_report.md",
-      "bytes": 2589,
-      "sha256": "bea0d36897df6322f3deb4e7973cd69aabfca75b464d757939474107a6591982"
+      "bytes": 3252,
+      "sha256": "36568e9bf48b45fafe1b789fee6ab6384991e6f93cc1df200de87d352abb1a25"
+    },
+    {
+      "path": "server_delivery.md",
+      "bytes": 857,
+      "sha256": "8e264c76cb2bec6fdfd6be3ee9ee14e70152f9849e05ad3898871b00e3677c25"
     },
     {
       "path": "README.md",
-      "bytes": 1331,
-      "sha256": "c72dfcb15eaf1ad35401e68e594310dea87518a260c14c2838d32239a263eb45"
+      "bytes": 1857,
+      "sha256": "f3699b99439f1cb34fb5240ee60c81e9304aa1ee4eb5ce303aa3b0e5d0d211f6"
     }
   ]
 }

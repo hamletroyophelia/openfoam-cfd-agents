@@ -30,8 +30,12 @@ def main() -> None:
             raise ValueError(f'size mismatch: {item["path"]}')
         if hashlib.sha256(path.read_bytes()).hexdigest() != item['sha256']:
             raise ValueError(f'hash mismatch: {item["path"]}')
-    for relative in manifest['acceptance']['final_pngs']:
-        if png_size(root / relative) != tuple(manifest['render']['resolution']):
+    expected_pngs = manifest['acceptance'].get('final_png_dimensions')
+    if expected_pngs is None:
+        expected_pngs = {relative: manifest['render']['resolution']
+                         for relative in manifest['acceptance']['final_pngs']}
+    for relative, expected in expected_pngs.items():
+        if png_size(root / relative) != tuple(expected):
             raise ValueError(f'wrong final PNG dimensions: {relative}')
     print(f'validated {len(manifest["artifacts"])} artifacts')
 

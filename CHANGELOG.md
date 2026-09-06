@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.1 — 2026-09-06
+
+- Add journal-style 2D field plots with `x/D`, `y/D` axes, in-panel labels and adjacent fixed-range colour bars.
+- Replace the cylinder sample's main velocity and vorticity images with visually reviewed 3223-pixel server renders.
+- Distinguish the published 41,014-point unstructured slice from the separate 321x181 exact-stride paper plane.
+
 ## 0.4.0 — 2026-09-06
 
 - Add a reusable, case-read-only CFD visualization workflow with strict decomposed-time audits and explicit resource limits.

@@ -1,0 +1,39 @@
+{
+  "input": "data/centre_plane_paper_t300.csv",
+  "outputs": [
+    "velocity_magnitude_t300_paper_final.png",
+    "vorticity_spanwise_t300_paper_final.png"
+  ],
+  "coordinates": "x/D and y/D",
+  "colorbar_pad_fraction": 0.015,
+  "source_grid": [641, 361],
+  "paper_grid": [321, 181],
+  "reduction": "retain every second x and y coordinate and the corresponding field values",
+  "output_dimensions": {
+    "velocity": [3223, 1799],
+    "vorticity": [3223, 1791]
+  },
+  "interpolation": "none beyond pcolormesh display of the audited rectilinear probe",
+  "smoothing": null,
+  "actual_ranges": {
+    "speed": [
+      0.0,
+      1.338166275
+    ],
+    "vorticity": [
+      -6.727251053,
+      7.012727737
+    ]
+  },
+  "fixed_ranges": {
+    "speed": [
+      0.0,
+      1.5
+    ],
+    "vorticity": [
+      -1.0,
+      1.0
+    ]
+  },
+  "preview": false
+}
