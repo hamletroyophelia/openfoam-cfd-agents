@@ -12,6 +12,23 @@ from .inventory import inspect_decomposed_time
 app = typer.Typer(no_args_is_help=True, help='Audit, prepare and plot reproducible CFD visualizations.')
 
 
+@app.command('plan-animation')
+def plan_animation(config: Annotated[Path, typer.Argument(exists=True, dir_okay=False)],
+                   times: Annotated[Path, typer.Argument(exists=True, dir_okay=False)],
+                   output: Annotated[Path, typer.Option()]):
+    """Validate saved field cadence before creating an animation."""
+    from .animation import assess_animation_times
+    values = json.loads(times.read_text(encoding='utf-8'))
+    if not isinstance(values, list):
+        raise typer.BadParameter('times must be a JSON list of dimensional source times')
+    result = assess_animation_times(load_visualization_config(config), values)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(result, indent=2) + '\n', encoding='utf-8')
+    typer.echo(str(output))
+    if not result['continuous_animation_allowed']:
+        raise typer.Exit(code=2)
+
+
 @app.command('prepare')
 def prepare(config: Annotated[Path, typer.Argument(exists=True, dir_okay=False)],
             output: Annotated[Path, typer.Option()]):

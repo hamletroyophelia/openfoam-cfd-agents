@@ -41,6 +41,14 @@ render:
 statistics:
   window: [0.0, 1.0]
   confidence_level: 0.95
+animation:
+  enabled: false
+  window_star: null
+  target_delta_time_star: null
+  reference_strouhal: null
+  minimum_frames_per_period: 20
+  output_fps: 24
+  interpolation: forbidden
 resources:
   processes: 1
   threads: 1

@@ -27,4 +27,5 @@
 - `centre_slice_unstructured_t300.csv` is the original unstructured slice. `centre_plane_paper_t300.csv` is the exact-stride rectilinear paper table. Q itself was computed from the full three-dimensional cell velocity gradient before point interpolation.
 - Cd restart segments are merged with explicit precedence at 290 s. Startup impulses at 0.01 and 0.02 s remain in the overview. The `t*=120–150` panel, corresponding to 240–300 s, is raw and unsmoothed.
 - The retained Q PNG was generated before schema v2 and colours the already nondimensional Q* surface by dimensional vorticity. The updated renderer now colours every new Q* image by `omega*=omega L_ref/U_ref`; rerendering this legacy Q image is deferred while the production sphere solver occupies the server.
+- The available converged field cadence is `delta_t*=5`. Relative to the exploratory `St=0.16902629`, it provides only about 1.18 real frames per period and fails the 20-frame video gate. It is suitable only for labelled coarse temporal comparisons; no interpolated video is claimed.
 - The Cd effective sample size is about 28.9. No confidence interval is reported. No spectrum is claimed in this phase.

@@ -1,6 +1,6 @@
 # OpenFOAM CFD Agents
 
-[中文说明](README.zh-CN.md) · [0.5.0 nondimensional paper visualization](examples/cylinder-t300/README.md) · [Changelog](CHANGELOG.md)
+[中文说明](README.zh-CN.md) · [0.5.1 nondimensional visualization and video cadence](examples/cylinder-t300/README.md) · [Changelog](CHANGELOG.md)
 
 An auditable, reproducible multi-agent workflow for the full lifecycle of OpenFOAM CFD cases. The current runtime profile targets **Foundation OpenFOAM v14**. Ports and adapters keep the core open to SU2, Fluent, STAR-CCM+, schedulers, and external agent systems.
 

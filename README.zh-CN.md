@@ -1,6 +1,6 @@
 # OpenFOAM CFD Agents
 
-[English](README.md) · [0.5.0 无量纲论文式科学可视化](examples/cylinder-t300/README.md) · [原始 V2 蓝图](docs/blueprint-v2-original/README.md)
+[English](README.md) · [0.5.1 无量纲可视化与视频时间采样](examples/cylinder-t300/README.md) · [原始 V2 蓝图](docs/blueprint-v2-original/README.md)
 
 面向 **Foundation OpenFOAM v14** 的确定性 CFD 工作流核心。Agent 可以提出建议，
 阶段是否通过由数值规则决定。当前提供可靠性工具、适配器及 Linux systemd 常驻

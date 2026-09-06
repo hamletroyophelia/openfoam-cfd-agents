@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "title": "Cylinder Re=100: first-stage scientific visualization",
-  "release": "0.5.0",
+  "release": "0.5.1",
   "created_at": "2026-09-06T18:05:37+08:00",
   "source": {
     "case_id": "cylinder_Re100_LES_WALE_Lz4D_v14force_20260902",
@@ -136,6 +136,7 @@
   "warnings": [
     "The fixed nondimensional vorticity scale saturates values outside [-2, 2]; the paper-plane extrema are approximately [-13.45, 14.03].",
     "The retained Q image predates schema v2 and colours Q* surfaces by dimensional vorticity; new renders colour them by omega*=omega L_ref/U_ref.",
+    "The saved converged fields at t=240,250,...,300 have delta_t*=5 and provide only about 1.18 frames per exploratory St=0.169 shedding period; they support coarse comparison panels, not continuous flow video.",
     "Visible angular transitions near the cylinder follow mesh-resolution transitions and persist across independent sampling checks; the paper layout uses an exact stride reduction and no smoothing.",
     "Startup Cd impulses at t=0.01 and 0.02 s are retained in the overview and excluded only by the declared statistics window.",
     "The portable pvsm stores cylinder.foam as a relative placeholder and requires relinking to the derived case view when opened."
@@ -186,8 +187,8 @@
   "artifacts": [
     {
       "path": "viz.yaml",
-      "bytes": 1215,
-      "sha256": "21577e99aa0c1f09a9faedca569ce8112d5c2431dab20536607fcc7e95f461b0"
+      "bytes": 1412,
+      "sha256": "366bf32b55735dd8dba94868d4411553a5e25d0ae7813fcf8d8a9c61fc56befa"
     },
     {
       "path": "cfd-publication.mplstyle",
@@ -208,6 +209,16 @@
       "path": "data/force_summary.json",
       "bytes": 1737,
       "sha256": "94107f29bf2707cf72c358ad6ef99bb5a7b5dd5363d2ba50b651d1391741f500"
+    },
+    {
+      "path": "data/converged_times.json",
+      "bytes": 66,
+      "sha256": "d5a443c7b835868a56f161225214bcb4d8ba83c2ffe25613e3d992deb671adc0"
+    },
+    {
+      "path": "data/animation_plan.json",
+      "bytes": 810,
+      "sha256": "45b82c79b006da4c4fcd467cfdbe10dc8dd46efedb374a678e79929bcaec1c10"
     },
     {
       "path": "data/centre_slice_unstructured_t300.csv",
@@ -281,8 +292,8 @@
     },
     {
       "path": "qa_report.md",
-      "bytes": 3954,
-      "sha256": "2131a76435bee8a706f437d5c44e0c1433aefadb33e4347efe1c5fcc0ead1023"
+      "bytes": 4238,
+      "sha256": "ebfa14a417981167397c901b516c0cdb5892c3bbf4fe41c2309f90491ae2f230"
     },
     {
       "path": "server_delivery.md",
@@ -291,8 +302,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 1918,
-      "sha256": "bc15e0422356e966d3cafb82dba92814a7411a887045202c99ecc1c7c90db305"
+      "bytes": 2255,
+      "sha256": "ef16ddfd94b61a251afebb29b6525580ad31f420b0c3e1cb625d741b4a3d9b54"
     }
   ]
 }

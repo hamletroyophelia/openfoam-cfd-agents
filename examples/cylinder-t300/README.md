@@ -6,6 +6,8 @@ Open [the static gallery](gallery/index.html), then read [manifest.json](manifes
 
 The main figures use paper-style `x/D`, `y/D` axes, compact in-panel labels and colour bars immediately beside the axes. Values are transformed before plotting: `|U|*=|U|/U_ref`, `omega_z*=omega_z D/U_ref`, and the force-history axis is `t*=t U_ref/D`. The dimensional source columns remain in `data/`. No field values are smoothed.
 
+For video, validate real saved-field cadence with `cfd-workflow visualize plan-animation`. The available converged fields at `t=240,250,...,300` have `delta_t*=5`; with the exploratory `St=0.169`, this is only about 1.18 frames per period. These fields may be shown as a coarse multi-time comparison, not as resolved continuous motion.
+
 Re-run the workflow with the repository skill at `.agents/skills/cfd-visualization/SKILL.md`. Prepare the JSON consumed by pvbatch with:
 
 ```powershell

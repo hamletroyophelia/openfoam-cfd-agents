@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.1 — 2026-09-06
+
+- Add an executable animation-cadence gate with nondimensional time windows, target spacing, frequency resolution, frames-per-period and Nyquist evidence.
+- Require at least 20 real saved fields per shortest period of interest and prohibit interpolated or duplicated frames from being presented as resolved CFD motion.
+- Classify the cylinder's seven available converged fields as a coarse temporal comparison because `delta_t*=5` provides only about 1.18 frames per exploratory shedding period.
+
 ## 0.5.0 — 2026-09-06
 
 - Make numerical nondimensionalization mandatory for every plotted quantity with defensible reference scales.

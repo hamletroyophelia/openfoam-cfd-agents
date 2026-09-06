@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "title": "Cylinder Re=100: first-stage scientific visualization",
-  "release": "0.5.0",
+  "release": "0.5.1",
   "created_at": "2026-09-06T18:05:37+08:00",
   "source": {
     "case_id": "cylinder_Re100_LES_WALE_Lz4D_v14force_20260902",
@@ -85,6 +85,7 @@
   "warnings": [
     "The fixed nondimensional vorticity scale saturates values outside [-2, 2]; the paper-plane extrema are approximately [-13.45, 14.03].",
     "The retained Q image predates schema v2 and colours Q* surfaces by dimensional vorticity; new renders colour them by omega*=omega L_ref/U_ref.",
+    "The saved converged fields at t=240,250,...,300 have delta_t*=5 and provide only about 1.18 frames per exploratory St=0.169 shedding period; they support coarse comparison panels, not continuous flow video.",
     "Visible angular transitions near the cylinder follow mesh-resolution transitions and persist across independent sampling checks; the paper layout uses an exact stride reduction and no smoothing.",
     "Startup Cd impulses at t=0.01 and 0.02 s are retained in the overview and excluded only by the declared statistics window.",
     "The portable pvsm stores cylinder.foam as a relative placeholder and requires relinking to the derived case view when opened."
@@ -105,7 +106,8 @@
   ],
   "artifact_paths": [
     "viz.yaml", "cfd-publication.mplstyle", "data/case-audit.json", "data/render_summary.json",
-    "data/force_summary.json", "data/centre_slice_unstructured_t300.csv",
+    "data/force_summary.json", "data/converged_times.json", "data/animation_plan.json",
+    "data/centre_slice_unstructured_t300.csv",
     "data/centre_plane_paper_t300.csv", "data/paper_layout_summary.json", "data/force_coefficients.csv",
     "figures/velocity_magnitude_t300.png", "figures/vorticity_spanwise_t300.png",
     "figures/qcriterion_qstar0.2_t300.png", "figures/cd_history.png", "figures/cd_history.svg",

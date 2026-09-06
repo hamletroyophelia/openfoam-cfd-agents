@@ -38,6 +38,14 @@ For pressure, first inspect the OpenFOAM dimensions and solver convention. Conve
 
 Store the reference values, symbols, units, source dictionaries, formulas, and transformed fixed ranges in `viz.yaml` and `manifest.json`. Retain dimensional source columns in extracted CSV files and add explicitly named nondimensional columns. If a reference is absent or physically ambiguous, keep that quantity dimensional and add a warning instead of inventing a scale.
 
+## Temporal sampling for video
+
+Plan field output cadence before running a solver when video or phase-resolved analysis is expected. Save real complete fields finely enough to resolve the shortest physical period of interest. Require at least 20 saved frames per period for a scientific flow video and prefer 30–40 frames per period for slow motion or quantitative phase comparison. For a target Strouhal number, enforce `delta_t* <= 1/(minimum_frames_per_period * St)` and record the achieved frames per period and conservative Nyquist Strouhal number.
+
+List every source time used by a video. Reject duplicates, mixed partition times, missing partitions, incomplete fields, and changing files. Keep source-time cadence separate from playback frame rate: `delta_t*` controls physical resolution, while `output_fps` controls viewing speed. Never duplicate or interpolate sparse CFD fields to imply resolved motion. When saved data fail the cadence gate, produce only a clearly labelled coarse temporal comparison or contact sheet.
+
+Enable the `animation` section in `viz.yaml`, provide a nondimensional window plus either `target_delta_time_star` or a reviewed `reference_strouhal`, and run `cfd-workflow visualize plan-animation viz.yaml times.json --output animation-plan.json` before rendering frames. A nonzero exit blocks continuous animation.
+
 Run [render_fields.py](scripts/render_fields.py) with pvbatch. Compute the velocity gradient on the complete three-dimensional velocity field before slicing or point interpolation. Skip Q when all three mesh spans are not physical. Record any sampling, interpolation, clipping, masking, or geometry overlay.
 
 Merge force segments with explicit half-open intervals. Fail on time regressions, non-finite values, and conflicting duplicate times. Plot the full raw history and an unsmoothed statistics-window panel. Use time integration for nonuniform samples. Withhold confidence intervals when time correlation leaves too few effective observations.
@@ -52,4 +60,4 @@ Open every PNG and inspect composition, type, scalar bars, occlusion, aliasing, 
 
 Build `manifest.json` and the static gallery with [build_bundle.py](scripts/build_bundle.py). Verify hashes, image dimensions, and required artifacts with [validate_bundle.py](scripts/validate_bundle.py). Follow [scientific-qa.md](references/scientific-qa.md) when reviewing a new case.
 
-Do not batch time steps or make an animation until the single-time bundle passes data, resource, and visual review. Never auto-rescale frames within a comparison set.
+Do not batch time steps or make an animation until the single-time bundle passes data, resource, visual, and temporal-cadence review. Never auto-rescale frames within a comparison set.

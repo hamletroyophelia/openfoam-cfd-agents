@@ -102,6 +102,27 @@ class StatisticsConfig(BaseModel):
         return self
 
 
+class AnimationConfig(BaseModel):
+    model_config = ConfigDict(extra='forbid', frozen=True, allow_inf_nan=False)
+    enabled: bool = False
+    window_star: tuple[float, float] | None = None
+    target_delta_time_star: float | None = Field(default=None, gt=0)
+    reference_strouhal: float | None = Field(default=None, gt=0)
+    minimum_frames_per_period: int = Field(default=20, ge=12)
+    output_fps: int = Field(default=24, ge=1, le=120)
+    interpolation: Literal['forbidden'] = 'forbidden'
+
+    @model_validator(mode='after')
+    def validate_animation_contract(self):
+        if not self.enabled:
+            return self
+        if self.window_star is None or self.window_star[0] >= self.window_star[1]:
+            raise ValueError('enabled animation requires an increasing window_star')
+        if self.target_delta_time_star is None and self.reference_strouhal is None:
+            raise ValueError('enabled animation requires target_delta_time_star or reference_strouhal')
+        return self
+
+
 class ResourceConfig(BaseModel):
     model_config = ConfigDict(extra='forbid', frozen=True, allow_inf_nan=False)
     processes: int = Field(ge=1)
@@ -116,6 +137,7 @@ class VisualizationConfig(BaseModel):
     physics: PhysicsConfig
     render: RenderConfig
     statistics: StatisticsConfig
+    animation: AnimationConfig = AnimationConfig()
     resources: ResourceConfig
 
 

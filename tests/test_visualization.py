@@ -23,6 +23,7 @@ def config_payload():
                    'velocity_star_range': [0, 1.5], 'vorticity_star_range': [-2, 2],
                    'qstar_threshold': 0.2},
         'statistics': {'window': [240, 300], 'confidence_level': 0.95},
+        'animation': {'enabled': False},
         'resources': {'processes': 1, 'threads': 1, 'memory_gib': 12},
     }
 
@@ -125,3 +126,34 @@ def test_periodic_short_window_does_not_get_optimistic_interval():
     stats = time_weighted_statistics(time_values, values, confidence_level=0.95)
     assert stats['effective_sample_size'] < 50
     assert stats['confidence_interval'] is None
+
+
+def test_animation_rejects_sparse_fields_and_accepts_resolved_cadence():
+    from openfoam_cfd_agents.visualization.animation import assess_animation_times
+    from openfoam_cfd_agents.visualization.config import VisualizationConfig
+    payload = config_payload()
+    payload['animation'] = {
+        'enabled': True, 'window_star': [120, 150], 'target_delta_time_star': 0.3,
+        'reference_strouhal': 0.16902629, 'minimum_frames_per_period': 20,
+        'output_fps': 24, 'interpolation': 'forbidden',
+    }
+    config = VisualizationConfig.model_validate(payload)
+    coarse = assess_animation_times(config, [240, 250, 260, 270, 280, 290, 300])
+    assert coarse['continuous_animation_allowed'] is False
+    assert coarse['classification'] == 'coarse_temporal_comparison_only'
+    assert coarse['actual_frames_per_period_using_max_gap'] == pytest.approx(1.18324797)
+    fine = assess_animation_times(config, [240 + 0.5 * index for index in range(121)])
+    assert fine['continuous_animation_allowed'] is True
+    assert fine['delta_time_star']['maximum'] == pytest.approx(0.25)
+
+
+def test_animation_rejects_duplicate_source_times():
+    from openfoam_cfd_agents.visualization.animation import assess_animation_times
+    from openfoam_cfd_agents.visualization.config import VisualizationConfig
+    payload = config_payload()
+    payload['animation'] = {'enabled': True, 'window_star': [120, 150],
+                            'target_delta_time_star': 0.25}
+    with pytest.raises(ValueError, match='duplicates'):
+        assess_animation_times(VisualizationConfig.model_validate(payload), [240, 240, 241])
+    with pytest.raises(ValueError, match='strictly increasing'):
+        assess_animation_times(VisualizationConfig.model_validate(payload), [240, 242, 241])
